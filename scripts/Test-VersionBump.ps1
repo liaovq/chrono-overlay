@@ -28,7 +28,9 @@ try {
     [version]$currentVersion = & (Join-Path $PSScriptRoot 'Get-Version.ps1')
     $baseSpec = '{0}:Directory.Build.props' -f $BaseRef
     $baseContent = @(git show $baseSpec 2>$null)
-    if ($LASTEXITCODE -eq 0) {
+    $baseVersionFileExists = $LASTEXITCODE -eq 0
+    $global:LASTEXITCODE = 0
+    if ($baseVersionFileExists) {
         $baseMatch = [regex]::Match(($baseContent -join "`n"), '<VersionPrefix>([^<]+)</VersionPrefix>')
         if (-not $baseMatch.Success) {
             throw "VersionPrefix is missing from $baseSpec."
