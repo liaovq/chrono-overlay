@@ -1,5 +1,7 @@
 # Manual Windows test checklist
 
+> 人工验收应优先下载最新成功 PR workflow 中的 RC artifact，并记录 workflow run ID、提交 SHA 和文件名。
+
 Record Windows version, monitor topology, DPI, executable path, and result for each run.
 
 ## Clock and controls

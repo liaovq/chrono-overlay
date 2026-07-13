@@ -25,6 +25,13 @@ jobs:
         shell: pwsh
         run: ./scripts/Test-VersionBump.ps1 -BaseRef origin/${{ github.base_ref }}
 
+      - name: Read version
+        id: version
+        shell: pwsh
+        run: |
+          $version = ./scripts/Get-Version.ps1
+          "version=$version" >> $env:GITHUB_OUTPUT
+
       - name: Setup .NET 8
         uses: actions/setup-dotnet@v4
         with:
@@ -46,9 +53,25 @@ jobs:
           -p:PublishSingleFile=true -p:PublishTrimmed=false
           -o artifacts/publish
 
+      - name: Prepare RC executable
+        shell: pwsh
+        run: |
+          $rcPath = "artifacts/ChronoOverlay-v${{ steps.version.outputs.version }}-win-x64-rc.exe"
+          Copy-Item -LiteralPath artifacts/publish/ChronoOverlay.exe -Destination $rcPath
+
       - name: Verify embedded PerMonitorV2 manifest
         shell: pwsh
-        run: ./scripts/Test-EmbeddedManifest.ps1 -ExecutablePath artifacts/publish/ChronoOverlay.exe
+        run: >-
+          ./scripts/Test-EmbeddedManifest.ps1
+          -ExecutablePath "artifacts/ChronoOverlay-v${{ steps.version.outputs.version }}-win-x64-rc.exe"
+
+      - name: Upload RC executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: ChronoOverlay-v${{ steps.version.outputs.version }}-win-x64-rc
+          path: artifacts/ChronoOverlay-v${{ steps.version.outputs.version }}-win-x64-rc.exe
+          retention-days: 7
+          if-no-files-found: error
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
