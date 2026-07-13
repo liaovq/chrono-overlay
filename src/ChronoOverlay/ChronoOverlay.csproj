@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\ChronoOverlay.ico</ApplicationIcon>
+    <AssemblyName>ChronoOverlay</AssemblyName>
+    <RootNamespace>ChronoOverlay</RootNamespace>
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PublishTrimmed>false</PublishTrimmed>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- WPF reads PerMonitorV2 from app.manifest. Suppress the WinForms-only guidance emitted
+         because System.Windows.Forms is referenced solely for NotifyIcon and Screen interop. -->
+    <NoWarn>$(NoWarn);WFAC010</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\ChronoOverlay.ico" />
+  </ItemGroup>
+
+</Project>

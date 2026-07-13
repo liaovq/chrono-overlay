@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{9417F1F5-4CAF-44E9-B65B-8845D9D3B065}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChronoOverlay", "src\ChronoOverlay\ChronoOverlay.csproj", "{372A2463-76A8-4726-A22B-D038133E0749}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{17830D63-D61C-439A-89B4-F5ED8A563011}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChronoOverlay.Tests", "tests\ChronoOverlay.Tests\ChronoOverlay.Tests.csproj", "{F1DE6B65-4D1F-41E0-8B62-881E62B87676}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{372A2463-76A8-4726-A22B-D038133E0749}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{372A2463-76A8-4726-A22B-D038133E0749}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{372A2463-76A8-4726-A22B-D038133E0749}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{372A2463-76A8-4726-A22B-D038133E0749}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1DE6B65-4D1F-41E0-8B62-881E62B87676}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1DE6B65-4D1F-41E0-8B62-881E62B87676}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1DE6B65-4D1F-41E0-8B62-881E62B87676}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1DE6B65-4D1F-41E0-8B62-881E62B87676}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{372A2463-76A8-4726-A22B-D038133E0749} = {9417F1F5-4CAF-44E9-B65B-8845D9D3B065}
+		{F1DE6B65-4D1F-41E0-8B62-881E62B87676} = {17830D63-D61C-439A-89B4-F5ED8A563011}
+	EndGlobalSection
+EndGlobal

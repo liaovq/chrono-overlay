@@ -1,0 +1,107 @@
+name: PR validation
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: windows-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate version bump
+        shell: pwsh
+        run: ./scripts/Test-VersionBump.ps1 -BaseRef origin/${{ github.base_ref }}
+
+      - name: Read version
+        id: version
+        shell: pwsh
+        run: |
+          $version = ./scripts/Get-Version.ps1
+          "version=$version" >> $env:GITHUB_OUTPUT
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore ChronoOverlay.sln --configfile NuGet.Config
+
+      - name: Build
+        run: dotnet build ChronoOverlay.sln -c Release --no-restore
+
+      - name: Test
+        run: dotnet test ChronoOverlay.sln -c Release --no-build --logger "trx;LogFileName=tests.trx"
+
+      - name: Publish preflight
+        run: >-
+          dotnet publish src/ChronoOverlay/ChronoOverlay.csproj
+          -c Release -r win-x64 --self-contained true --no-build
+          -p:PublishSingleFile=true -p:PublishTrimmed=false
+          -o artifacts/publish
+
+      - name: Prepare RC executable
+        shell: pwsh
+        run: |
+          $rcPath = "artifacts/ChronoOverlay-v${{ steps.version.outputs.version }}-win-x64-rc.exe"
+          Copy-Item -LiteralPath artifacts/publish/ChronoOverlay.exe -Destination $rcPath
+
+      - name: Verify embedded PerMonitorV2 manifest
+        shell: pwsh
+        run: >-
+          ./scripts/Test-EmbeddedManifest.ps1
+          -ExecutablePath "artifacts/ChronoOverlay-v${{ steps.version.outputs.version }}-win-x64-rc.exe"
+
+      - name: Upload RC executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: ChronoOverlay-v${{ steps.version.outputs.version }}-win-x64-rc
+          path: artifacts/ChronoOverlay-v${{ steps.version.outputs.version }}-win-x64-rc.exe
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.4
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: site/pnpm-lock.yaml
+
+      - name: Install website dependencies
+        working-directory: site
+        run: pnpm install --frozen-lockfile
+
+      - name: Build website
+        working-directory: site
+        run: pnpm run build
+
+      - name: Verify version consistency
+        shell: pwsh
+        run: ./scripts/Test-VersionConsistency.ps1
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: '**/TestResults/*.trx'
+          if-no-files-found: ignore

@@ -1,0 +1,155 @@
+name: Release and Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: release-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+      tag: ${{ steps.meta.outputs.tag }}
+      asset_name: ${{ steps.meta.outputs.asset_name }}
+      release_needed: ${{ steps.meta.outputs.release_needed }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read release metadata
+        id: meta
+        shell: pwsh
+        run: |
+          $version = ./scripts/Get-Version.ps1
+          $releaseNeeded = 'true'
+          if ('${{ github.event_name }}' -eq 'push' -and (git rev-list --count HEAD) -gt 1) {
+            $releaseNeeded = (./scripts/Test-VersionBump.ps1 -BaseRef HEAD^).Split('=')[1]
+          }
+          $tag = "v$version"
+          $assetName = "ChronoOverlay-v$version-win-x64.exe"
+          "version=$version" >> $env:GITHUB_OUTPUT
+          "tag=$tag" >> $env:GITHUB_OUTPUT
+          "asset_name=$assetName" >> $env:GITHUB_OUTPUT
+          "release_needed=$releaseNeeded" >> $env:GITHUB_OUTPUT
+
+          if ($releaseNeeded -eq 'true') {
+            git ls-remote --exit-code --tags origin "refs/tags/$tag" *> $null
+            if ($LASTEXITCODE -eq 0) {
+              throw "Tag $tag already exists. Bump VersionPrefix before merging release-impacting changes."
+            }
+          }
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore, build, and test
+        run: |
+          dotnet restore ChronoOverlay.sln --configfile NuGet.Config
+          dotnet build ChronoOverlay.sln -c Release --no-restore
+          dotnet test ChronoOverlay.sln -c Release --no-build
+
+      - name: Publish Windows executable
+        if: steps.meta.outputs.release_needed == 'true'
+        shell: pwsh
+        run: |
+          dotnet publish src/ChronoOverlay/ChronoOverlay.csproj `
+            -c Release -r win-x64 --self-contained true --no-build `
+            -p:PublishSingleFile=true -p:PublishTrimmed=false `
+            -o artifacts/publish
+          Move-Item artifacts/publish/ChronoOverlay.exe "artifacts/${{ steps.meta.outputs.asset_name }}"
+
+      - name: Verify embedded PerMonitorV2 manifest
+        if: steps.meta.outputs.release_needed == 'true'
+        shell: pwsh
+        run: ./scripts/Test-EmbeddedManifest.ps1 -ExecutablePath "artifacts/${{ steps.meta.outputs.asset_name }}"
+
+      - name: Upload executable artifact
+        if: steps.meta.outputs.release_needed == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.meta.outputs.asset_name }}
+          path: artifacts/${{ steps.meta.outputs.asset_name }}
+          if-no-files-found: error
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.4
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: site/pnpm-lock.yaml
+
+      - name: Install and build website
+        working-directory: site
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm run build
+
+      - name: Verify version consistency
+        shell: pwsh
+        run: ./scripts/Test-VersionConsistency.ps1
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/dist
+
+  release:
+    needs: build
+    if: needs.build.outputs.release_needed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download executable
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.build.outputs.asset_name }}
+          path: release
+
+      - name: Create tag and GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create "${{ needs.build.outputs.tag }}"
+          "release/${{ needs.build.outputs.asset_name }}"
+          --target "${{ github.sha }}"
+          --title "ChronoOverlay ${{ needs.build.outputs.tag }}"
+          --generate-notes
+
+  deploy-pages:
+    needs: [build, release]
+    if: always() && needs.build.result == 'success' && (needs.release.result == 'success' || needs.release.result == 'skipped')
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
