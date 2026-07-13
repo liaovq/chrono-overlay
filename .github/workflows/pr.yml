@@ -49,7 +49,7 @@ jobs:
       - name: Publish preflight
         run: >-
           dotnet publish src/ChronoOverlay/ChronoOverlay.csproj
-          -c Release -r win-x64 --self-contained true --no-build
+          -c Release -r win-x64 --self-contained false --no-build
           -p:PublishSingleFile=true -p:PublishTrimmed=false
           -o artifacts/publish
 
@@ -63,6 +63,19 @@ jobs:
         shell: pwsh
         run: >-
           ./scripts/Test-EmbeddedManifest.ps1
+          -ExecutablePath "artifacts/ChronoOverlay-v${{ steps.version.outputs.version }}-win-x64-rc.exe"
+
+      - name: Verify framework-dependent publish
+        shell: pwsh
+        run: >-
+          ./scripts/Test-FrameworkDependentPublish.ps1
+          -PublishDirectory artifacts/publish
+          -ExecutablePath "artifacts/ChronoOverlay-v${{ steps.version.outputs.version }}-win-x64-rc.exe"
+
+      - name: Smoke-test published executable
+        shell: pwsh
+        run: >-
+          ./scripts/Test-ExecutableStartup.ps1
           -ExecutablePath "artifacts/ChronoOverlay-v${{ steps.version.outputs.version }}-win-x64-rc.exe"
 
       - name: Upload RC executable

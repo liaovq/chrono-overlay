@@ -17,7 +17,7 @@ The version produces:
 
 1. version-bump rules against `origin/main`;
 2. .NET restore, Release build, and unit tests;
-3. self-contained single-file Windows publish;
+3. framework-dependent single-file Windows publish, size guard, and launch smoke test;
 4. deterministic website dependency installation and production build;
 5. website/Release URL version consistency.
 
@@ -27,6 +27,7 @@ The version produces:
 
 - Release-impacting changes require a new version and fail clearly if `v{version}` already exists.
 - The workflow builds/tests/publishes on Windows, creates the tag and GitHub Release, and uploads the versioned EXE.
+- The EXE requires the x64 .NET 8 Desktop Runtime. CI rejects unexpectedly bundled runtime DLLs or an executable larger than 10 MiB.
 - Documentation-only changes skip duplicate Release creation.
 - The website is always built and deployed through GitHub Pages Actions.
 

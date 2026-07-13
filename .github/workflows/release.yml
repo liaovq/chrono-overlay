@@ -76,7 +76,7 @@ jobs:
         shell: pwsh
         run: |
           dotnet publish src/ChronoOverlay/ChronoOverlay.csproj `
-            -c Release -r win-x64 --self-contained true --no-build `
+            -c Release -r win-x64 --self-contained false --no-build `
             -p:PublishSingleFile=true -p:PublishTrimmed=false `
             -o artifacts/publish
           Move-Item artifacts/publish/ChronoOverlay.exe "artifacts/${{ steps.meta.outputs.asset_name }}"
@@ -85,6 +85,19 @@ jobs:
         if: steps.meta.outputs.release_needed == 'true'
         shell: pwsh
         run: ./scripts/Test-EmbeddedManifest.ps1 -ExecutablePath "artifacts/${{ steps.meta.outputs.asset_name }}"
+
+      - name: Verify framework-dependent publish
+        if: steps.meta.outputs.release_needed == 'true'
+        shell: pwsh
+        run: >-
+          ./scripts/Test-FrameworkDependentPublish.ps1
+          -PublishDirectory artifacts/publish
+          -ExecutablePath "artifacts/${{ steps.meta.outputs.asset_name }}"
+
+      - name: Smoke-test published executable
+        if: steps.meta.outputs.release_needed == 'true'
+        shell: pwsh
+        run: ./scripts/Test-ExecutableStartup.ps1 -ExecutablePath "artifacts/${{ steps.meta.outputs.asset_name }}"
 
       - name: Upload executable artifact
         if: steps.meta.outputs.release_needed == 'true'

@@ -595,6 +595,18 @@ input[type="range"] {
   font-size: 14px;
 }
 
+.runtime-link {
+  margin-top: 18px;
+  color: var(--blue-light);
+  font-size: 14px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.runtime-link:hover {
+  color: #fff;
+}
+
 .github-link:hover {
   color: #fff;
 }

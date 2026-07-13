@@ -12,6 +12,7 @@ import heroBackground from "./assets/hero-desktop-context.png";
 import hueSpectrum from "./assets/hue-spectrum.png";
 
 const repositoryUrl = "https://github.com/liaovq/chrono-overlay";
+const desktopRuntimeUrl = "https://dotnet.microsoft.com/download/dotnet/8.0";
 
 const weekdays = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
 
@@ -181,6 +182,7 @@ export function App() {
           <div className="meta-row">
             <span>v{__APP_VERSION__}</span>
             <span>Windows 10/11 x64</span>
+            <span>需 .NET 8 Desktop Runtime</span>
             <span>MIT 开源</span>
           </div>
         </div>
@@ -258,12 +260,13 @@ export function App() {
         <div className="download-mark"><Tray size={42} weight="duotone" /></div>
         <p className="eyebrow">现在就让时间安静陪伴你</p>
         <h2>立即体验 <span>ChronoOverlay</span></h2>
-        <p>单文件 EXE，无需安装 .NET Runtime。</p>
+        <p>轻量单文件 EXE，需要预先安装 x64 .NET 8 Desktop Runtime。</p>
         <DownloadButton className="download-section__button" />
         <div className="meta-row meta-row--center">
           <span>v{__APP_VERSION__}</span>
           <span>Windows 10/11 x64</span>
         </div>
+        <a className="runtime-link" href={desktopRuntimeUrl}>下载微软 .NET 8 Desktop Runtime</a>
         <a className="github-link" href={repositoryUrl}><GithubLogo size={20} weight="fill" />查看 GitHub</a>
       </section>
 

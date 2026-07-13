@@ -19,17 +19,19 @@ ChronoOverlay 是一个轻量、可锁定、始终置顶的 Windows 桌面悬浮
 
 ## 使用
 
-1. 从 [GitHub Releases](https://github.com/liaovq/chrono-overlay/releases) 下载最新的版本化 EXE。
-2. 双击运行，无需预装 .NET Runtime。
-3. 调整样式和位置后点击“锁定”。
-4. 双击时间数字，或从系统托盘选择“显示面板 / 解锁”。
-5. 从托盘菜单选择“退出程序”以真正结束进程。
+1. 安装微软官方的 [.NET 8 Desktop Runtime（Windows x64）](https://dotnet.microsoft.com/download/dotnet/8.0)。已经安装 .NET 8 SDK 的电脑无需重复安装。
+2. 从 [GitHub Releases](https://github.com/liaovq/chrono-overlay/releases) 下载最新的版本化 EXE。
+3. 双击 EXE 直接运行；ChronoOverlay 是便携式程序，没有单独的安装向导。
+4. 调整样式和位置后点击“锁定”。
+5. 双击时间数字，或从系统托盘选择“显示面板 / 解锁”。
+6. 从托盘菜单选择“退出程序”以真正结束进程。
 
 锁定状态采用选择性鼠标穿透。背景、日期和空白区域不会阻挡下方软件；时间数字区域会拦截点击，以便接收双击解锁操作。
 
 ## 系统支持
 
 - Windows 10/11 x64
+- .NET 8 Desktop Runtime x64
 - 普通桌面窗口和常见无边框全屏窗口始终置顶
 - 不保证覆盖 UAC、安全桌面、Windows 锁屏或独占全屏游戏
 
@@ -51,7 +53,7 @@ pnpm run build
 
 ```powershell
 dotnet publish src/ChronoOverlay/ChronoOverlay.csproj `
-  -c Release -r win-x64 --self-contained true `
+  -c Release -r win-x64 --self-contained false `
   -p:PublishSingleFile=true -p:PublishTrimmed=false
 ```
 
