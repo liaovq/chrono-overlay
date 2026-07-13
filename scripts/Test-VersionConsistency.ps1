@@ -16,6 +16,12 @@ if ($viteConfig -notmatch 'Directory\.Build\.props') {
     throw 'The website must read its version from Directory.Build.props.'
 }
 
+$appSettingsPath = Join-Path $PSScriptRoot '..\src\ChronoOverlay\Models\AppSettings.cs'
+$appSettingsSource = Get-Content -Raw -LiteralPath $appSettingsPath
+if ($appSettingsSource -match 'AppVersion\s*\{[^}]*\}\s*=\s*"\d+\.\d+\.\d+"') {
+    throw 'AppSettings must not hardcode a concrete application version default.'
+}
+
 if (-not (Test-Path -LiteralPath $SiteDist)) {
     throw "Website build output does not exist: $SiteDist"
 }

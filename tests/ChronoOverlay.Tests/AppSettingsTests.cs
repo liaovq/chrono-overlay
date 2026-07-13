@@ -25,6 +25,7 @@ public sealed class AppSettingsTests
         Assert.Equal(330, settings.Hue);
         Assert.Equal(96, settings.SavedDpi);
         Assert.Equal("#FFFFFF", settings.TextColor);
+        Assert.Equal(AppSettings.CurrentSchemaVersion, settings.SchemaVersion);
     }
 
     [Fact]

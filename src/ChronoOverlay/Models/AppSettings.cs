@@ -4,7 +4,7 @@ namespace ChronoOverlay.Models;
 
 public sealed class AppSettings
 {
-    public const int CurrentSchemaVersion = 1;
+    public const int CurrentSchemaVersion = 2;
     public const double MinTimeFontSize = 32;
     public const double MaxTimeFontSize = 128;
     public const double MinDateFontSize = 16;
@@ -12,11 +12,23 @@ public sealed class AppSettings
 
     public int SchemaVersion { get; set; } = CurrentSchemaVersion;
 
-    public string AppVersion { get; set; } = "0.1.0";
+    public string AppVersion { get; set; } = string.Empty;
 
     public double? WindowX { get; set; }
 
     public double? WindowY { get; set; }
+
+    public int? WindowPhysicalX { get; set; }
+
+    public int? WindowPhysicalY { get; set; }
+
+    public int? WindowPhysicalWidth { get; set; }
+
+    public int? WindowPhysicalHeight { get; set; }
+
+    public int? ClockAnchorOffsetX { get; set; }
+
+    public int? ClockAnchorOffsetY { get; set; }
 
     public string? MonitorDeviceName { get; set; }
 

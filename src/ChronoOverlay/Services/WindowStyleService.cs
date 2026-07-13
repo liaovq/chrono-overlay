@@ -51,6 +51,12 @@ public static partial class WindowStyleService
         SetWindowPos(handle, HwndTopmost, x, y, width, height, SwpNoActivate);
     }
 
+    public static void SetPhysicalPosition(Window window, int x, int y)
+    {
+        nint handle = new WindowInteropHelper(window).Handle;
+        SetWindowPos(handle, HwndTopmost, x, y, 0, 0, SwpNoSize | SwpNoActivate);
+    }
+
     private static nint GetWindowLongPtr(nint handle, int index) => IntPtr.Size == 8
         ? GetWindowLongPtr64(handle, index)
         : new nint(GetWindowLong32(handle, index));

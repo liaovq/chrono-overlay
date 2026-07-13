@@ -6,7 +6,6 @@
         mc:Ignorable="d"
         AllowsTransparency="True"
         Background="Transparent"
-        ShowActivated="True"
         ShowInTaskbar="False"
         SizeToContent="WidthAndHeight"
         Topmost="True"

@@ -142,7 +142,7 @@ public sealed class ClockViewModel : INotifyPropertyChanged, IDisposable
 
     public void RequestLock() => LockRequested?.Invoke(this, EventArgs.Empty);
 
-    public void SetLocked(bool locked)
+    public void SetLocked(bool locked, bool saveImmediately = true)
     {
         if (Settings.IsLocked == locked)
         {
@@ -151,7 +151,10 @@ public sealed class ClockViewModel : INotifyPropertyChanged, IDisposable
 
         Settings.IsLocked = locked;
         OnPropertyChanged(nameof(IsLocked));
-        SaveImmediately();
+        if (saveImmediately)
+        {
+            SaveImmediately();
+        }
     }
 
     public void RefreshAutoStart(bool enabled)

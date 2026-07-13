@@ -14,7 +14,9 @@
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <PublishTrimmed>false</PublishTrimmed>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <!-- WPF reads PerMonitorV2 from app.manifest. Suppress the WinForms-only guidance emitted
+         because System.Windows.Forms is referenced solely for NotifyIcon and Screen interop. -->
+    <NoWarn>$(NoWarn);WFAC010</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

@@ -7,13 +7,19 @@ public sealed class SingleInstanceService : IDisposable
     private const string MutexName = @"Local\ChronoOverlay.SingleInstance";
     private const string WakeEventName = @"Local\ChronoOverlay.Wake";
     private readonly Mutex _mutex;
-    private EventWaitHandle? _wakeEvent;
+    private readonly EventWaitHandle _wakeEvent;
     private RegisteredWaitHandle? _registration;
     private bool _ownsMutex;
 
     public SingleInstanceService()
+        : this(MutexName, WakeEventName)
     {
-        _mutex = new Mutex(true, MutexName, out _ownsMutex);
+    }
+
+    internal SingleInstanceService(string mutexName, string wakeEventName)
+    {
+        _wakeEvent = new EventWaitHandle(false, EventResetMode.AutoReset, wakeEventName);
+        _mutex = new Mutex(true, mutexName, out _ownsMutex);
     }
 
     public bool IsPrimary => _ownsMutex;
@@ -25,7 +31,6 @@ public sealed class SingleInstanceService : IDisposable
             throw new InvalidOperationException("Only the primary instance can listen.");
         }
 
-        _wakeEvent = new EventWaitHandle(false, EventResetMode.AutoReset, WakeEventName);
         _registration = ThreadPool.RegisterWaitForSingleObject(
             _wakeEvent,
             (_, _) => onWake(),
@@ -34,23 +39,12 @@ public sealed class SingleInstanceService : IDisposable
             false);
     }
 
-    public static void SignalPrimary()
-    {
-        try
-        {
-            using EventWaitHandle wakeEvent = EventWaitHandle.OpenExisting(WakeEventName);
-            wakeEvent.Set();
-        }
-        catch (WaitHandleCannotBeOpenedException)
-        {
-            // The primary process may still be starting. A second launch should still exit.
-        }
-    }
+    public void SignalPrimary() => _wakeEvent.Set();
 
     public void Dispose()
     {
         _registration?.Unregister(null);
-        _wakeEvent?.Dispose();
+        _wakeEvent.Dispose();
         if (_ownsMutex)
         {
             _mutex.ReleaseMutex();

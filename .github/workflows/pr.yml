@@ -46,6 +46,10 @@ jobs:
           -p:PublishSingleFile=true -p:PublishTrimmed=false
           -o artifacts/publish
 
+      - name: Verify embedded PerMonitorV2 manifest
+        shell: pwsh
+        run: ./scripts/Test-EmbeddedManifest.ps1 -ExecutablePath artifacts/publish/ChronoOverlay.exe
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:

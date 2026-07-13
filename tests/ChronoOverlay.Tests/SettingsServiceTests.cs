@@ -16,6 +16,14 @@ public sealed class SettingsServiceTests : IDisposable
         {
             WindowX = -800.5,
             WindowY = 42.25,
+            WindowPhysicalX = -1200,
+            WindowPhysicalY = 80,
+            WindowPhysicalWidth = 640,
+            WindowPhysicalHeight = 420,
+            ClockAnchorOffsetX = 1510,
+            ClockAnchorOffsetY = 44,
+            MonitorDeviceName = @"\\.\DISPLAY2",
+            SavedDpi = 144,
             TimeFontSize = 88,
             DateFontSize = 28,
             TextColor = "#12A4FF",
@@ -31,6 +39,10 @@ public sealed class SettingsServiceTests : IDisposable
 
         Assert.Equal(expected.WindowX, actual.WindowX);
         Assert.Equal(expected.WindowY, actual.WindowY);
+        Assert.Equal(-1200, actual.WindowPhysicalX);
+        Assert.Equal(1510, actual.ClockAnchorOffsetX);
+        Assert.Equal(@"\\.\DISPLAY2", actual.MonitorDeviceName);
+        Assert.Equal(144, actual.SavedDpi);
         Assert.Equal(88, actual.TimeFontSize);
         Assert.Equal("#12A4FF", actual.TextColor);
         Assert.True(actual.IsLocked);
@@ -49,6 +61,34 @@ public sealed class SettingsServiceTests : IDisposable
         Assert.Equal(72, settings.TimeFontSize);
         Assert.Equal(32, settings.DateFontSize);
         Assert.Equal(0.60, settings.BackgroundOpacity);
+        Assert.Equal(VersionService.Current, settings.AppVersion);
+    }
+
+    [Fact]
+    public void MissingAppVersionIsReplacedWithRuntimeVersion()
+    {
+        Directory.CreateDirectory(_directory);
+        File.WriteAllText(Path.Combine(_directory, "config.json"), "{\"schemaVersion\":1}");
+        using SettingsService service = new(_directory);
+
+        AppSettings settings = service.Load();
+
+        Assert.Equal(VersionService.Current, settings.AppVersion);
+        Assert.Equal(AppSettings.CurrentSchemaVersion, settings.SchemaVersion);
+    }
+
+    [Fact]
+    public void OldAppVersionIsReplacedWithRuntimeVersion()
+    {
+        Directory.CreateDirectory(_directory);
+        File.WriteAllText(
+            Path.Combine(_directory, "config.json"),
+            "{\"schemaVersion\":1,\"appVersion\":\"0.0.7\"}");
+        using SettingsService service = new(_directory);
+
+        AppSettings settings = service.Load();
+
+        Assert.Equal(VersionService.Current, settings.AppVersion);
     }
 
     [Fact]
@@ -73,6 +113,18 @@ public sealed class SettingsServiceTests : IDisposable
 
         Assert.Equal("Black", document.RootElement.GetProperty("colorMode").GetString());
         Assert.True(document.RootElement.TryGetProperty("backgroundOpacity", out _));
+    }
+
+    [Fact]
+    public void SerializationAlwaysWritesRuntimeAppVersion()
+    {
+        AppSettings settings = new() { AppVersion = "0.0.1" };
+
+        string json = SettingsService.Serialize(settings);
+        using JsonDocument document = JsonDocument.Parse(json);
+
+        Assert.Equal(VersionService.Current, document.RootElement.GetProperty("appVersion").GetString());
+        Assert.Equal(VersionService.Current, settings.AppVersion);
     }
 
     public void Dispose()

@@ -74,6 +74,11 @@ jobs:
             -o artifacts/publish
           Move-Item artifacts/publish/ChronoOverlay.exe "artifacts/${{ steps.meta.outputs.asset_name }}"
 
+      - name: Verify embedded PerMonitorV2 manifest
+        if: steps.meta.outputs.release_needed == 'true'
+        shell: pwsh
+        run: ./scripts/Test-EmbeddedManifest.ps1 -ExecutablePath "artifacts/${{ steps.meta.outputs.asset_name }}"
+
       - name: Upload executable artifact
         if: steps.meta.outputs.release_needed == 'true'
         uses: actions/upload-artifact@v4

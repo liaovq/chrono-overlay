@@ -43,7 +43,9 @@ public sealed class SettingsService : IDisposable
         {
             string json = File.ReadAllText(_settingsPath);
             AppSettings? settings = JsonSerializer.Deserialize<AppSettings>(json, JsonOptions);
-            return (settings ?? CreateDefaults()).Normalize();
+            AppSettings loaded = (settings ?? CreateDefaults()).Normalize();
+            loaded.AppVersion = VersionService.Current;
+            return loaded;
         }
         catch (Exception exception) when (exception is JsonException or IOException or UnauthorizedAccessException)
         {
@@ -78,7 +80,11 @@ public sealed class SettingsService : IDisposable
         TrySave(settings);
     }
 
-    public static string Serialize(AppSettings settings) => JsonSerializer.Serialize(settings.Normalize(), JsonOptions);
+    public static string Serialize(AppSettings settings)
+    {
+        settings.AppVersion = VersionService.Current;
+        return JsonSerializer.Serialize(settings.Normalize(), JsonOptions);
+    }
 
     private static AppSettings CreateDefaults() => new() { AppVersion = VersionService.Current };
 

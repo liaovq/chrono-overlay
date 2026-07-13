@@ -18,11 +18,12 @@ public partial class App : System.Windows.Application
     {
         base.OnStartup(eventArgs);
         ShutdownMode = ShutdownMode.OnExplicitShutdown;
+        StartupMode startupMode = StartupModeParser.Parse(eventArgs.Args);
 
         _singleInstanceService = new SingleInstanceService();
         if (!_singleInstanceService.IsPrimary)
         {
-            SingleInstanceService.SignalPrimary();
+            _singleInstanceService.SignalPrimary();
             Shutdown();
             return;
         }
@@ -33,7 +34,7 @@ public partial class App : System.Windows.Application
         ReconcileAutoStart(autoStartService, settings);
 
         _viewModel = new ClockViewModel(settings, new ClockService(), _settingsService);
-        _clockWindow = new ClockWindow(_viewModel, _settingsService, new DisplayPlacementService());
+        _clockWindow = new ClockWindow(_viewModel, _settingsService, new DisplayPlacementService(), startupMode);
         _trayIconService = new TrayIconService(_clockWindow, _viewModel, autoStartService);
         _clockWindow.ExitRequested += (_, _) => Shutdown();
         _settingsService.SaveFailed += OnSaveFailed;
@@ -45,7 +46,7 @@ public partial class App : System.Windows.Application
         SessionEnding += OnSessionEnding;
 
         MainWindow = _clockWindow;
-        _clockWindow.Show();
+        _clockWindow.ShowForStartup();
     }
 
     protected override void OnExit(ExitEventArgs eventArgs)
@@ -81,13 +82,13 @@ public partial class App : System.Windows.Application
     }
 
     private void OnDisplaySettingsChanged(object? sender, EventArgs eventArgs) =>
-        Dispatcher.BeginInvoke(() => _clockWindow?.EnsureVisibleAndTopmost());
+        Dispatcher.BeginInvoke(() => _clockWindow?.EnsureVisibleAndTopmost(persistPlacement: true));
 
     private void OnUserPreferenceChanged(object sender, UserPreferenceChangedEventArgs eventArgs)
     {
         if (eventArgs.Category is UserPreferenceCategory.Desktop or UserPreferenceCategory.Window)
         {
-            Dispatcher.BeginInvoke(() => _clockWindow?.EnsureVisibleAndTopmost());
+            Dispatcher.BeginInvoke(() => _clockWindow?.EnsureVisibleAndTopmost(persistPlacement: true));
         }
     }
 
