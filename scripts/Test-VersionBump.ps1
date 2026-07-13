@@ -16,6 +16,8 @@ try {
         $_ -and
         $_ -ne 'LICENSE' -and
         $_ -ne '.github/pull_request_template.md' -and
+        $_ -notlike '.github/workflows/*' -and
+        $_ -ne 'scripts/Test-VersionBump.ps1' -and
         $_ -notmatch '(^|/)[^/]+\.md$' -and
         $_ -notlike 'docs/*'
     })
