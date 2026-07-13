@@ -13,6 +13,7 @@ ChronoOverlay is a .NET 8 WPF application targeting `win-x64`. Releases are fram
 - `WindowStyleService` applies Win32 extended styles for tool-window behavior, click-through, no-activate, and topmost placement.
 - `DisplayPlacementService` uses `GetWindowRect`, `MonitorFromWindow`, `GetMonitorInfo`, and per-monitor DPI to persist and restore one explicit physical-pixel coordinate model.
 - `TrayIconService`, `AutoStartService`, and `SingleInstanceService` isolate Windows lifecycle integrations.
+- `ThirdPartyLicenseContentService` reads the notice and three complete OFL texts from embedded WPF resources; `ThirdPartyLicenseWindowService` owns a single reusable local license-window instance without touching clock state.
 
 ## Selective click-through
 

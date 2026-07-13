@@ -13,6 +13,11 @@ Record Windows version, monitor topology, DPI, executable path, and result for e
 - [ ] In File Explorer large, medium, and small icon views, confirm the EXE uses the warm sun-and-horizon artwork with no white square, checkerboard, clipped edge, or legacy `C` icon.
 - [ ] At 100%, 150%, and 200% display scaling, confirm the notification-area icon remains recognizable and uses the same artwork.
 - [ ] Check the notification-area icon on both light and dark Windows taskbar themes; its silhouette and warm color layers remain visible.
+- [ ] Disconnect the network, open the tray menu, and confirm “第三方许可” opens a local WPF window without launching a browser.
+- [ ] Confirm the license window lists JetBrains Mono, IBM Plex Mono, and Space Mono with copyright holders and upstream URLs.
+- [ ] Search/select/copy text from the read-only license area and confirm each font section contains the complete “SIL OPEN FONT LICENSE Version 1.1” text.
+- [ ] Click “第三方许可” repeatedly and confirm only one license window exists; closing it leaves the clock and tray process running.
+- [ ] Repeat while the clock is locked and unlocked; opening/closing the license window does not change lock state, selective click-through, position, or topmost behavior.
 
 ## Clock and controls
 
