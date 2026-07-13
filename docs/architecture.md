@@ -7,6 +7,7 @@ ChronoOverlay is a .NET 8 WPF application targeting `win-x64`. Releases are fram
 - `ClockWindow` renders the clock, date, background, and unlocked control panel.
 - `LockedHotspotWindow` is a transparent, topmost, non-activating window that covers only the measured time text rectangle.
 - `ClockViewModel` owns display state and settings bindings.
+- `ClockFontCatalog` resolves the system fallback and the three OFL-licensed fonts packaged as WPF resources.
 - `ClockService` aligns updates to system second boundaries.
 - `SettingsService` validates, debounces, and atomically persists configuration.
 - `WindowStyleService` applies Win32 extended styles for tool-window behavior, click-through, no-activate, and topmost placement.
@@ -22,7 +23,11 @@ The locked state deliberately uses two native windows:
 
 The hotspot is synchronized after layout, position, size, DPI, monitor, and lock-state changes. This avoids a global mouse hook and keeps date/background clicks available to the application underneath.
 
+The hotspot window deliberately renders a visually imperceptible but non-zero-alpha surface. Its native tool-window setup explicitly removes `WS_EX_TRANSPARENT`; otherwise a fully transparent layered WPF window can be omitted from Windows hit testing and accidentally degrade the behavior to whole-window click-through.
+
 Lock and unlock transitions capture the physical top-right anchor of `ClockSurface`, change the `SizeToContent` layout, then compensate the native window position before the hotspot or settings are synchronized. This keeps the visible clock fixed even when the control panel is wider than the clock.
+
+While unlocked, `ControlPanelPlacementMath` compares the measured physical panel height with the active monitor's physical work area. It keeps the panel below when possible, flips it above when the lower edge would be clipped, and preserves the clock anchor during the row swap.
 
 ## Startup and single instance
 

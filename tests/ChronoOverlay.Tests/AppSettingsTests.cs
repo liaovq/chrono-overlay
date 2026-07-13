@@ -38,4 +38,28 @@ public sealed class AppSettingsTests
         Assert.Equal(-1400, settings.WindowX);
         Assert.Equal(-20, settings.WindowY);
     }
+
+    [Fact]
+    public void NormalizeReplacesUnknownClockFontWithSystemMono()
+    {
+        AppSettings settings = new() { ClockFontId = "missing-font" };
+
+        settings.Normalize();
+
+        Assert.Equal(ClockFontIds.SystemMono, settings.ClockFontId);
+    }
+
+    [Theory]
+    [InlineData(ClockFontIds.SystemMono)]
+    [InlineData(ClockFontIds.JetBrainsMono)]
+    [InlineData(ClockFontIds.IbmPlexMono)]
+    [InlineData(ClockFontIds.SpaceMono)]
+    public void NormalizePreservesSupportedClockFonts(string fontId)
+    {
+        AppSettings settings = new() { ClockFontId = fontId };
+
+        settings.Normalize();
+
+        Assert.Equal(fontId, settings.ClockFontId);
+    }
 }

@@ -4,7 +4,7 @@ namespace ChronoOverlay.Models;
 
 public sealed class AppSettings
 {
-    public const int CurrentSchemaVersion = 2;
+    public const int CurrentSchemaVersion = 3;
     public const double MinTimeFontSize = 32;
     public const double MaxTimeFontSize = 128;
     public const double MinDateFontSize = 16;
@@ -38,6 +38,8 @@ public sealed class AppSettings
 
     public double DateFontSize { get; set; } = 32;
 
+    public string ClockFontId { get; set; } = ClockFontIds.SystemMono;
+
     public string TextColor { get; set; } = "#FFFFFF";
 
     public ColorMode ColorMode { get; set; } = ColorMode.White;
@@ -55,6 +57,7 @@ public sealed class AppSettings
         SchemaVersion = CurrentSchemaVersion;
         TimeFontSize = Math.Clamp(TimeFontSize, MinTimeFontSize, MaxTimeFontSize);
         DateFontSize = Math.Clamp(DateFontSize, MinDateFontSize, MaxDateFontSize);
+        ClockFontId = ClockFontIds.Normalize(ClockFontId);
         BackgroundOpacity = Math.Clamp(BackgroundOpacity, 0, 1);
         Hue = ColorUtilities.NormalizeHue(Hue);
         SavedDpi = SavedDpi is >= 48 and <= 768 ? SavedDpi : 96;
