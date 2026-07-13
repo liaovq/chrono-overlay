@@ -10,6 +10,9 @@ Record Windows version, monitor topology, DPI, executable path, and result for e
 - [ ] On a clean Windows Sandbox without .NET 8 Desktop Runtime, launch the RC and confirm Windows presents the missing-runtime guidance instead of silently crashing.
 - [ ] Install the x64 [.NET 8 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/8.0), relaunch the same RC, and confirm the clock and tray icon appear.
 - [ ] Confirm the embedded PerMonitorV2 manifest still passes `scripts/Test-EmbeddedManifest.ps1`.
+- [ ] In File Explorer large, medium, and small icon views, confirm the EXE uses the warm sun-and-horizon artwork with no white square, checkerboard, clipped edge, or legacy `C` icon.
+- [ ] At 100%, 150%, and 200% display scaling, confirm the notification-area icon remains recognizable and uses the same artwork.
+- [ ] Check the notification-area icon on both light and dark Windows taskbar themes; its silhouette and warm color layers remain visible.
 
 ## Clock and controls
 
