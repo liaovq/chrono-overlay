@@ -1,0 +1,29 @@
+# .NET
+**/bin/
+**/obj/
+artifacts/
+TestResults/
+
+# Node
+site/node_modules/
+site/dist/
+site/vite-server.log*
+site/.npm-cache/
+.pnpm-store/
+
+# Local tool state
+.dotnet-home/
+.appdata/
+.nuget/
+.vs/
+.vscode/
+*.user
+*.suo
+
+# Local application configuration
+config.json
+config.corrupt-*.json
+
+# OS files
+Thumbs.db
+.DS_Store
