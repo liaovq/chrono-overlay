@@ -18,11 +18,9 @@ public static partial class WindowStyleService
     public static void ConfigureToolWindow(Window window, bool noActivate = false)
     {
         nint handle = new WindowInteropHelper(window).Handle;
-        long styles = GetWindowLongPtr(handle, GwlExStyle).ToInt64() | WsExToolWindow;
-        if (noActivate)
-        {
-            styles |= WsExNoActivate;
-        }
+        long styles = CalculateToolWindowExtendedStyle(
+            GetWindowLongPtr(handle, GwlExStyle).ToInt64(),
+            noActivate);
 
         SetWindowLongPtr(handle, GwlExStyle, new nint(styles));
         EnsureTopmost(window);
@@ -31,12 +29,30 @@ public static partial class WindowStyleService
     public static void SetClickThrough(Window window, bool enabled)
     {
         nint handle = new WindowInteropHelper(window).Handle;
-        long styles = GetWindowLongPtr(handle, GwlExStyle).ToInt64();
+        long styles = CalculateClickThroughExtendedStyle(
+            GetWindowLongPtr(handle, GwlExStyle).ToInt64(),
+            enabled);
+        SetWindowLongPtr(handle, GwlExStyle, new nint(styles));
+    }
+
+    public static long CalculateToolWindowExtendedStyle(long styles, bool noActivate)
+    {
+        styles |= WsExToolWindow;
+        if (noActivate)
+        {
+            styles |= WsExNoActivate;
+            styles &= ~WsExTransparent;
+        }
+
+        return styles;
+    }
+
+    public static long CalculateClickThroughExtendedStyle(long styles, bool enabled)
+    {
         styles = enabled
             ? styles | WsExTransparent | WsExNoActivate
             : styles & ~WsExTransparent & ~WsExNoActivate;
-        styles |= WsExToolWindow;
-        SetWindowLongPtr(handle, GwlExStyle, new nint(styles));
+        return styles | WsExToolWindow;
     }
 
     public static void EnsureTopmost(Window window)

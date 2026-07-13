@@ -12,6 +12,7 @@ public partial class App : System.Windows.Application
     private SettingsService? _settingsService;
     private ClockViewModel? _viewModel;
     private TrayIconService? _trayIconService;
+    private ThirdPartyLicenseWindowService? _licenseWindowService;
     private ClockWindow? _clockWindow;
 
     protected override void OnStartup(StartupEventArgs eventArgs)
@@ -35,7 +36,12 @@ public partial class App : System.Windows.Application
 
         _viewModel = new ClockViewModel(settings, new ClockService(), _settingsService);
         _clockWindow = new ClockWindow(_viewModel, _settingsService, new DisplayPlacementService(), startupMode);
-        _trayIconService = new TrayIconService(_clockWindow, _viewModel, autoStartService);
+        _licenseWindowService = new ThirdPartyLicenseWindowService(new ThirdPartyLicenseContentService());
+        _trayIconService = new TrayIconService(
+            _clockWindow,
+            _viewModel,
+            autoStartService,
+            _licenseWindowService);
         _clockWindow.ExitRequested += (_, _) => Shutdown();
         _settingsService.SaveFailed += OnSaveFailed;
 
@@ -55,6 +61,7 @@ public partial class App : System.Windows.Application
         SystemEvents.UserPreferenceChanged -= OnUserPreferenceChanged;
         SystemEvents.PowerModeChanged -= OnPowerModeChanged;
         _trayIconService?.Dispose();
+        _licenseWindowService?.Dispose();
         _viewModel?.Dispose();
         _settingsService?.Dispose();
         _singleInstanceService?.Dispose();

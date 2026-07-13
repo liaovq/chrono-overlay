@@ -1,9 +1,9 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Windows.Media;
 using ChronoOverlay.Models;
 using ChronoOverlay.Services;
 using ChronoOverlay.Utilities;
+using MediaFontFamily = System.Windows.Media.FontFamily;
 
 namespace ChronoOverlay.ViewModels;
 
@@ -76,6 +76,27 @@ public sealed class ClockViewModel : INotifyPropertyChanged, IDisposable
         }
     }
 
+    public IReadOnlyList<ClockFontOption> FontOptions => ClockFontCatalog.Options;
+
+    public string SelectedFontId
+    {
+        get => Settings.ClockFontId;
+        set
+        {
+            string normalized = ClockFontIds.Normalize(value);
+            if (Settings.ClockFontId == normalized)
+            {
+                return;
+            }
+
+            Settings.ClockFontId = normalized;
+            Changed();
+            OnPropertyChanged(nameof(SelectedFontFamily));
+        }
+    }
+
+    public MediaFontFamily SelectedFontFamily => ClockFontCatalog.Resolve(Settings.ClockFontId).FontFamily;
+
     public double BackgroundOpacity
     {
         get => Settings.BackgroundOpacity;
@@ -113,7 +134,7 @@ public sealed class ClockViewModel : INotifyPropertyChanged, IDisposable
         get
         {
             System.Windows.Media.Color color = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(Settings.TextColor);
-            return new SolidColorBrush(color);
+            return new System.Windows.Media.SolidColorBrush(color);
         }
     }
 

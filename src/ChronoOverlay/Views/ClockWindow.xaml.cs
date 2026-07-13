@@ -10,11 +10,13 @@ using System.Windows.Threading;
 using ChronoOverlay.Services;
 using ChronoOverlay.ViewModels;
 using DrawingPoint = System.Drawing.Point;
+using DrawingRectangle = System.Drawing.Rectangle;
 
 namespace ChronoOverlay.Views;
 
 public partial class ClockWindow : Window
 {
+    private const double ControlPanelGapDip = 6;
     private const int WmDpiChanged = 0x02E0;
     private readonly ClockViewModel _viewModel;
     private readonly SettingsService _settingsService;
@@ -26,6 +28,8 @@ public partial class ClockWindow : Window
     private bool _dragCandidate;
     private bool _allowClose;
     private bool _layoutTransition;
+    private bool _panelPlacementPending;
+    private ControlPanelPlacement _controlPanelPlacement = ControlPanelPlacement.Below;
 
     public ClockWindow(
         ClockViewModel viewModel,
@@ -93,9 +97,15 @@ public partial class ClockWindow : Window
 
     public void EnsureVisibleAndTopmost(bool persistPlacement = false)
     {
+        bool panelPlacementChanged = !_layoutTransition && RepositionControlPanelPreservingClockAnchor();
         bool corrected = !_layoutTransition &&
             _placementService.EnsureVisible(this, ClockSurface, _viewModel.Settings);
-        if (!_layoutTransition && (corrected || persistPlacement))
+        if (corrected && !_viewModel.IsLocked)
+        {
+            panelPlacementChanged |= RepositionControlPanelPreservingClockAnchor();
+        }
+
+        if (!_layoutTransition && (corrected || panelPlacementChanged || persistPlacement))
         {
             CaptureAndSavePlacement();
         }
@@ -132,6 +142,11 @@ public partial class ClockWindow : Window
         _viewModel.SetLocked(locked, saveImmediately: false);
         ControlPanel.Visibility = locked ? Visibility.Collapsed : Visibility.Visible;
         UpdateLayout();
+        if (!locked)
+        {
+            ApplyBestControlPanelPlacement(desiredAnchor);
+            UpdateLayout();
+        }
 
         Dispatcher.BeginInvoke(DispatcherPriority.Render, new Action(() =>
         {
@@ -177,7 +192,8 @@ public partial class ClockWindow : Window
         Dispatcher.BeginInvoke(DispatcherPriority.Render, new Action(() =>
         {
             UpdateLayout();
-            if (requiresPersistence)
+            bool panelPlacementChanged = RepositionControlPanelPreservingClockAnchor();
+            if (requiresPersistence || panelPlacementChanged)
             {
                 CaptureAndSavePlacement();
             }
@@ -217,6 +233,10 @@ public partial class ClockWindow : Window
             {
                 SyncHotspot();
             }
+            else
+            {
+                RepositionControlPanelPreservingClockAnchor();
+            }
 
             CaptureAndSavePlacement();
         }));
@@ -240,16 +260,13 @@ public partial class ClockWindow : Window
             return;
         }
 
-        System.Windows.Point topLeft = TimeText.PointToScreen(new System.Windows.Point(0, 0));
-        DpiScale dpi = VisualTreeHelper.GetDpi(TimeText);
-        int width = Math.Max(1, (int)Math.Ceiling(TimeText.ActualWidth * dpi.DpiScaleX));
-        int height = Math.Max(1, (int)Math.Ceiling(TimeText.ActualHeight * dpi.DpiScaleY));
+        DrawingRectangle bounds = DisplayPlacementService.GetElementPhysicalRect(TimeText);
         WindowStyleService.SetPhysicalBounds(
             _hotspotWindow,
-            (int)Math.Round(topLeft.X),
-            (int)Math.Round(topLeft.Y),
-            width,
-            height);
+            bounds.Left,
+            bounds.Top,
+            bounds.Width,
+            bounds.Height);
     }
 
     private void CaptureAndSavePlacement()
@@ -275,6 +292,10 @@ public partial class ClockWindow : Window
         if (_viewModel.IsLocked && !_layoutTransition)
         {
             Dispatcher.BeginInvoke(DispatcherPriority.Render, new Action(SyncHotspot));
+        }
+        else if (!_layoutTransition)
+        {
+            ScheduleControlPanelPlacement();
         }
     }
 
@@ -309,7 +330,9 @@ public partial class ClockWindow : Window
         try
         {
             DragMove();
+            RepositionControlPanelPreservingClockAnchor();
             _placementService.EnsureVisible(this, ClockSurface, _viewModel.Settings);
+            RepositionControlPanelPreservingClockAnchor();
             CaptureAndSavePlacement();
         }
         catch (InvalidOperationException)
@@ -331,7 +354,11 @@ public partial class ClockWindow : Window
     {
         for (DependencyObject? current = source; current is not null; current = VisualTreeHelper.GetParent(current))
         {
-            if (current is System.Windows.Controls.Primitives.ButtonBase or Slider or System.Windows.Controls.CheckBox)
+            if (current is System.Windows.Controls.Primitives.ButtonBase or
+                System.Windows.Controls.Slider or
+                System.Windows.Controls.CheckBox or
+                System.Windows.Controls.ComboBox or
+                System.Windows.Controls.ComboBoxItem)
             {
                 return true;
             }
@@ -354,6 +381,86 @@ public partial class ClockWindow : Window
     private void OnWhiteClick(object sender, RoutedEventArgs eventArgs) => _viewModel.SetWhite();
 
     private void OnLockClick(object sender, RoutedEventArgs eventArgs) => Lock();
+
+    private void ScheduleControlPanelPlacement()
+    {
+        if (_panelPlacementPending || !IsLoaded || _viewModel.IsLocked)
+        {
+            return;
+        }
+
+        _panelPlacementPending = true;
+        Dispatcher.BeginInvoke(DispatcherPriority.Render, new Action(() =>
+        {
+            _panelPlacementPending = false;
+            if (RepositionControlPanelPreservingClockAnchor())
+            {
+                CaptureAndSavePlacement();
+            }
+        }));
+    }
+
+    private bool RepositionControlPanelPreservingClockAnchor()
+    {
+        if (_layoutTransition || _viewModel.IsLocked || !IsLoaded || !ControlPanel.IsVisible)
+        {
+            return false;
+        }
+
+        DrawingPoint desiredAnchor = DisplayPlacementService.GetClockAnchorPhysical(ClockSurface);
+        _layoutTransition = true;
+        bool changed;
+        try
+        {
+            UpdateLayout();
+            changed = ApplyBestControlPanelPlacement(desiredAnchor);
+            if (changed)
+            {
+                UpdateLayout();
+                _placementService.PreserveClockAnchor(this, ClockSurface, desiredAnchor);
+                UpdateLayout();
+            }
+        }
+        finally
+        {
+            _layoutTransition = false;
+        }
+
+        return changed;
+    }
+
+    private bool ApplyBestControlPanelPlacement(DrawingPoint desiredAnchor)
+    {
+        DrawingRectangle currentClockBounds = DisplayPlacementService.GetElementPhysicalRect(ClockSurface);
+        DrawingRectangle desiredClockBounds = new(
+            desiredAnchor.X - currentClockBounds.Width,
+            desiredAnchor.Y,
+            currentClockBounds.Width,
+            currentClockBounds.Height);
+        MonitorWorkArea monitor = _placementService.GetMonitorForRectangle(desiredClockBounds);
+        DpiScale dpi = VisualTreeHelper.GetDpi(ControlPanel);
+        int panelHeight = Math.Max(1, (int)Math.Ceiling(ControlPanel.ActualHeight * dpi.DpiScaleY));
+        int gap = Math.Max(0, (int)Math.Ceiling(ControlPanelGapDip * dpi.DpiScaleY));
+        ControlPanelPlacement placement = ControlPanelPlacementMath.Resolve(
+            monitor.WorkArea,
+            desiredClockBounds,
+            panelHeight,
+            gap);
+
+        if (_controlPanelPlacement == placement)
+        {
+            return false;
+        }
+
+        _controlPanelPlacement = placement;
+        bool below = placement == ControlPanelPlacement.Below;
+        Grid.SetRow(ClockSurface, below ? 0 : 1);
+        Grid.SetRow(ControlPanel, below ? 1 : 0);
+        ControlPanel.Margin = below
+            ? new Thickness(0, ControlPanelGapDip, 0, 0)
+            : new Thickness(0, 0, 0, ControlPanelGapDip);
+        return true;
+    }
 
     private void OnClosing(object? sender, CancelEventArgs eventArgs)
     {

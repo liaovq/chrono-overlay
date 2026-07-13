@@ -198,6 +198,31 @@ public sealed class DisplayPlacementService
         return new DrawingPoint((int)Math.Round(screenPoint.X), (int)Math.Round(screenPoint.Y));
     }
 
+    public MonitorWorkArea GetMonitorForElement(FrameworkElement element)
+    {
+        Rectangle bounds = GetElementPhysicalRect(element);
+        return GetMonitorForRectangle(bounds);
+    }
+
+    public MonitorWorkArea GetMonitorForRectangle(Rectangle bounds)
+    {
+        NativeRect nativeBounds = NativeRect.FromRectangle(bounds);
+        return GetMonitor(MonitorFromRect(ref nativeBounds, MonitorDefaultToNearest));
+    }
+
+    public static Rectangle GetElementPhysicalRect(FrameworkElement element)
+    {
+        System.Windows.Point topLeft = element.PointToScreen(new System.Windows.Point(0, 0));
+        DpiScale dpi = System.Windows.Media.VisualTreeHelper.GetDpi(element);
+        int width = Math.Max(1, (int)Math.Ceiling(element.ActualWidth * dpi.DpiScaleX));
+        int height = Math.Max(1, (int)Math.Ceiling(element.ActualHeight * dpi.DpiScaleY));
+        return new Rectangle(
+            (int)Math.Round(topLeft.X),
+            (int)Math.Round(topLeft.Y),
+            width,
+            height);
+    }
+
     public static Rectangle GetWindowPhysicalRect(Window window)
     {
         nint handle = new WindowInteropHelper(window).Handle;
@@ -280,6 +305,14 @@ public sealed class DisplayPlacementService
         public int Bottom;
 
         public readonly Rectangle ToRectangle() => Rectangle.FromLTRB(Left, Top, Right, Bottom);
+
+        public static NativeRect FromRectangle(Rectangle rectangle) => new()
+        {
+            Left = rectangle.Left,
+            Top = rectangle.Top,
+            Right = rectangle.Right,
+            Bottom = rectangle.Bottom,
+        };
     }
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
@@ -310,6 +343,9 @@ public sealed class DisplayPlacementService
 
     [DllImport("user32.dll")]
     private static extern nint MonitorFromWindow(nint window, uint flags);
+
+    [DllImport("user32.dll")]
+    private static extern nint MonitorFromRect(ref NativeRect rect, uint flags);
 
     [DllImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]

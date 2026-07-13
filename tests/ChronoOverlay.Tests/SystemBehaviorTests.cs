@@ -212,4 +212,77 @@ public sealed class SystemBehaviorTests
         Assert.Equal(desiredAnchor.X, currentAnchor.X + compensated.X - collapsedWindowTopLeft.X);
         Assert.Equal(desiredAnchor.Y, currentAnchor.Y + compensated.Y - collapsedWindowTopLeft.Y);
     }
+
+    [Fact]
+    public void ControlPanelStaysBelowWhenItFitsInWorkArea()
+    {
+        Rectangle workArea = new(0, 0, 1920, 1040);
+        Rectangle clock = new(1400, 200, 480, 160);
+
+        ControlPanelPlacement placement = ControlPanelPlacementMath.Resolve(workArea, clock, 280, 6);
+
+        Assert.Equal(ControlPanelPlacement.Below, placement);
+    }
+
+    [Fact]
+    public void ControlPanelFlipsAboveWhenBottomWouldBeClipped()
+    {
+        Rectangle workArea = new(0, 0, 1920, 1040);
+        Rectangle clock = new(1400, 820, 480, 160);
+
+        ControlPanelPlacement placement = ControlPanelPlacementMath.Resolve(workArea, clock, 280, 6);
+
+        Assert.Equal(ControlPanelPlacement.Above, placement);
+    }
+
+    [Fact]
+    public void ControlPanelSupportsNegativeMonitorCoordinates()
+    {
+        Rectangle workArea = new(-2560, -200, 2560, 1400);
+        Rectangle clock = new(-700, 870, 620, 140);
+
+        ControlPanelPlacement placement = ControlPanelPlacementMath.Resolve(workArea, clock, 300, 8);
+
+        Assert.Equal(ControlPanelPlacement.Above, placement);
+    }
+
+    [Fact]
+    public void ControlPanelUsesSideWithMoreSpaceWhenNeitherSideFits()
+    {
+        Rectangle workArea = new(0, 0, 800, 500);
+        Rectangle clock = new(200, 300, 400, 120);
+
+        ControlPanelPlacement placement = ControlPanelPlacementMath.Resolve(workArea, clock, 400, 6);
+
+        Assert.Equal(ControlPanelPlacement.Above, placement);
+    }
+
+    [Fact]
+    public void HotspotToolWindowExplicitlyClearsClickThroughStyle()
+    {
+        const long wsExTransparent = 0x00000020L;
+        const long wsExToolWindow = 0x00000080L;
+        const long wsExNoActivate = 0x08000000L;
+
+        long styles = WindowStyleService.CalculateToolWindowExtendedStyle(wsExTransparent, noActivate: true);
+
+        Assert.Equal(0, styles & wsExTransparent);
+        Assert.NotEqual(0, styles & wsExToolWindow);
+        Assert.NotEqual(0, styles & wsExNoActivate);
+    }
+
+    [Fact]
+    public void VisualClockClickThroughStyleCanBeEnabledAndRemoved()
+    {
+        const long wsExTransparent = 0x00000020L;
+        const long wsExNoActivate = 0x08000000L;
+
+        long locked = WindowStyleService.CalculateClickThroughExtendedStyle(0, enabled: true);
+        long unlocked = WindowStyleService.CalculateClickThroughExtendedStyle(locked, enabled: false);
+
+        Assert.NotEqual(0, locked & wsExTransparent);
+        Assert.NotEqual(0, locked & wsExNoActivate);
+        Assert.Equal(0, unlocked & wsExTransparent);
+        Assert.Equal(0, unlocked & wsExNoActivate);
+    }
 }

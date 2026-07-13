@@ -30,6 +30,21 @@ public sealed class ClockViewModelTests : IDisposable
         Assert.NotEqual("#FFFFFF", settings.TextColor);
     }
 
+    [Fact]
+    public void FontSelectionUpdatesSettingsAndResolvedFamily()
+    {
+        AppSettings settings = new();
+        using SettingsService settingsService = new(_directory);
+        using ClockViewModel viewModel = new(settings, new ClockService(), settingsService);
+
+        viewModel.SelectedFontId = ClockFontIds.SpaceMono;
+
+        Assert.Equal(ClockFontIds.SpaceMono, settings.ClockFontId);
+        Assert.Equal(ClockFontIds.SpaceMono, viewModel.SelectedFontId);
+        Assert.Contains("Space Mono", viewModel.SelectedFontFamily.Source, StringComparison.Ordinal);
+        Assert.Equal(4, viewModel.FontOptions.Count);
+    }
+
     public void Dispose()
     {
         if (Directory.Exists(_directory))

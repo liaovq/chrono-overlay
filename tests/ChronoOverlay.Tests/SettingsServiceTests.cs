@@ -26,6 +26,7 @@ public sealed class SettingsServiceTests : IDisposable
             SavedDpi = 144,
             TimeFontSize = 88,
             DateFontSize = 28,
+            ClockFontId = ClockFontIds.JetBrainsMono,
             TextColor = "#12A4FF",
             ColorMode = ColorMode.Hue,
             Hue = 203,
@@ -44,6 +45,7 @@ public sealed class SettingsServiceTests : IDisposable
         Assert.Equal(@"\\.\DISPLAY2", actual.MonitorDeviceName);
         Assert.Equal(144, actual.SavedDpi);
         Assert.Equal(88, actual.TimeFontSize);
+        Assert.Equal(ClockFontIds.JetBrainsMono, actual.ClockFontId);
         Assert.Equal("#12A4FF", actual.TextColor);
         Assert.True(actual.IsLocked);
         Assert.Empty(Directory.GetFiles(_directory, "*.tmp"));
@@ -61,7 +63,22 @@ public sealed class SettingsServiceTests : IDisposable
         Assert.Equal(72, settings.TimeFontSize);
         Assert.Equal(32, settings.DateFontSize);
         Assert.Equal(0.60, settings.BackgroundOpacity);
+        Assert.Equal(ClockFontIds.SystemMono, settings.ClockFontId);
         Assert.Equal(VersionService.Current, settings.AppVersion);
+    }
+
+    [Fact]
+    public void SchemaTwoConfigurationMigratesToDefaultClockFont()
+    {
+        Directory.CreateDirectory(_directory);
+        File.WriteAllText(Path.Combine(_directory, "config.json"), "{\"schemaVersion\":2,\"timeFontSize\":80}");
+        using SettingsService service = new(_directory);
+
+        AppSettings settings = service.Load();
+
+        Assert.Equal(AppSettings.CurrentSchemaVersion, settings.SchemaVersion);
+        Assert.Equal(ClockFontIds.SystemMono, settings.ClockFontId);
+        Assert.Equal(80, settings.TimeFontSize);
     }
 
     [Fact]

@@ -13,6 +13,11 @@ Record Windows version, monitor topology, DPI, executable path, and result for e
 - [ ] In File Explorer large, medium, and small icon views, confirm the EXE uses the warm sun-and-horizon artwork with no white square, checkerboard, clipped edge, or legacy `C` icon.
 - [ ] At 100%, 150%, and 200% display scaling, confirm the notification-area icon remains recognizable and uses the same artwork.
 - [ ] Check the notification-area icon on both light and dark Windows taskbar themes; its silhouette and warm color layers remain visible.
+- [ ] Disconnect the network, open the tray menu, and confirm “第三方许可” opens a local WPF window without launching a browser.
+- [ ] Confirm the license window lists JetBrains Mono, IBM Plex Mono, and Space Mono with copyright holders and upstream URLs.
+- [ ] Search/select/copy text from the read-only license area and confirm each font section contains the complete “SIL OPEN FONT LICENSE Version 1.1” text.
+- [ ] Click “第三方许可” repeatedly and confirm only one license window exists; closing it leaves the clock and tray process running.
+- [ ] Repeat while the clock is locked and unlocked; opening/closing the license window does not change lock state, selective click-through, position, or topmost behavior.
 
 ## Clock and controls
 
@@ -25,13 +30,19 @@ Record Windows version, monitor topology, DPI, executable path, and result for e
 - [ ] Double-clicking time while unlocked locks without starting a drag.
 - [ ] At 32px, 72px, and 128px time sizes, place a visible reference at the clock surface's top-right corner, lock/unlock 10 times, and confirm the corner does not visibly move.
 - [ ] Repeat the anchor test while the control panel is wider than the clock content; no horizontal jump is visible.
+- [ ] Drag the unlocked clock close to the bottom edge; the entire control panel flips above the clock and the lock button remains reachable.
+- [ ] Drag it back near the top edge; the panel returns below the clock without moving the clock surface's top-right anchor.
+- [ ] Repeat panel placement on a left-side negative-coordinate monitor and at 100%, 150%, and 200% DPI; the panel chooses the current monitor work area and does not cross the taskbar.
+- [ ] Select 系统等宽, JetBrains Mono, IBM Plex Mono, and Space Mono; each option changes the clock immediately, keeps the digits tabular, and still renders the Chinese date correctly through font fallback.
+- [ ] Restart after selecting each bundled font and confirm the same font is restored.
 
 ## Locked selection and input
 
 - [ ] Control panel collapses and clock background shrinks around content.
-- [ ] Background, date, and empty regions click through to an application underneath.
-- [ ] Time digits intercept a single click.
+- [ ] Place Notepad or Paint underneath and confirm background, date, and empty regions receive clicks in that underlying application.
+- [ ] Over the same underlying target, confirm a single click on the time digits is intercepted and does not reach the application below.
 - [ ] Double-clicking time digits unlocks and restores the panel.
+- [ ] Repeat the previous three checks with background concentration at 0%, 60%, and 100%; input behavior does not depend on visual opacity.
 - [ ] Hotspot matches the time rectangle at 100%, 125%, 150%, and 200% DPI.
 - [ ] No global mouse hook is present or running.
 

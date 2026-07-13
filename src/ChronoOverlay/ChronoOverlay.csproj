@@ -22,6 +22,11 @@
 
   <ItemGroup>
     <Resource Include="Assets\ChronoOverlay.ico" />
+    <Resource Include="Assets\Fonts\*.ttf" />
+    <Resource Include="Assets\Fonts\Licenses\*.txt" />
+    <Resource Include="..\..\THIRD-PARTY-NOTICES.md">
+      <Link>Assets\Licenses\THIRD-PARTY-NOTICES.md</Link>
+    </Resource>
   </ItemGroup>
 
 </Project>

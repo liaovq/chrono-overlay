@@ -72,11 +72,30 @@
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="Cursor" Value="Hand" />
         </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="Height" Value="27" />
+            <Setter Property="Foreground" Value="#FF1A1F25" />
+            <Setter Property="Background" Value="#FFF4F6F8" />
+            <Setter Property="BorderBrush" Value="#FF39414B" />
+            <Setter Property="Padding" Value="8,3" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="MaxDropDownHeight" Value="240" />
+        </Style>
+        <Style TargetType="ComboBoxItem">
+            <Setter Property="Foreground" Value="#FF1A1F25" />
+            <Setter Property="Background" Value="#FFF4F6F8" />
+            <Setter Property="Padding" Value="8,5" />
+        </Style>
     </Window.Resources>
 
     <Border x:Name="WindowBorder" CornerRadius="8" Background="#01000000">
-        <StackPanel>
-            <Grid x:Name="ClockSurface" Margin="0">
+        <Grid x:Name="LayoutRoot">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid x:Name="ClockSurface" Grid.Row="0" Margin="0">
                 <Border Background="#FF000000"
                         CornerRadius="8"
                         Opacity="{Binding BackgroundOpacity}" />
@@ -84,7 +103,7 @@
                     <TextBlock x:Name="TimeText"
                                Text="{Binding TimeText}"
                                Foreground="{Binding TextBrush}"
-                               FontFamily="Cascadia Mono, Consolas"
+                               FontFamily="{Binding SelectedFontFamily}"
                                FontSize="{Binding TimeFontSize}"
                                FontWeight="SemiBold"
                                TextAlignment="Right"
@@ -92,6 +111,7 @@
                                MouseLeftButtonDown="OnTimeMouseLeftButtonDown" />
                     <TextBlock Text="{Binding DateText}"
                                Foreground="{Binding TextBrush}"
+                               FontFamily="{Binding SelectedFontFamily}"
                                FontSize="{Binding DateFontSize}"
                                FontWeight="Medium"
                                TextAlignment="Right"
@@ -101,6 +121,7 @@
             </Grid>
 
             <Border x:Name="ControlPanel"
+                    Grid.Row="1"
                     Margin="0,6,0,0"
                     Padding="14"
                     Background="#F21A1F25"
@@ -114,6 +135,7 @@
                         <ColumnDefinition Width="48" />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="32" />
                         <RowDefinition Height="32" />
                         <RowDefinition Height="32" />
                         <RowDefinition Height="32" />
@@ -133,16 +155,34 @@
                     <TextBlock Grid.Row="1" Grid.Column="2" Style="{StaticResource ValueStyle}"
                                Text="{Binding DateFontSize, StringFormat={}{0:0}px}" />
 
-                    <TextBlock Grid.Row="2" Style="{StaticResource LabelStyle}" Text="背景浓度" />
-                    <Slider Grid.Row="2" Grid.Column="1" Minimum="0" Maximum="1" TickFrequency="0.01"
+                    <TextBlock Grid.Row="2" Style="{StaticResource LabelStyle}" Text="字体" />
+                    <ComboBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2"
+                              ItemsSource="{Binding FontOptions}"
+                              SelectedValuePath="Id"
+                              SelectedValue="{Binding SelectedFontId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding DisplayName}"
+                                               FontFamily="{Binding FontFamily}"
+                                               Foreground="#FF1A1F25" />
+                                    <TextBlock Text="{Binding Description, StringFormat={}  · {0}}"
+                                               Margin="8,0,0,0" Foreground="#FF59636F" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+
+                    <TextBlock Grid.Row="3" Style="{StaticResource LabelStyle}" Text="背景浓度" />
+                    <Slider Grid.Row="3" Grid.Column="1" Minimum="0" Maximum="1" TickFrequency="0.01"
                             Value="{Binding BackgroundOpacity, UpdateSourceTrigger=PropertyChanged}" />
-                    <TextBlock Grid.Row="2" Grid.Column="2" Style="{StaticResource ValueStyle}"
+                    <TextBlock Grid.Row="3" Grid.Column="2" Style="{StaticResource ValueStyle}"
                                Text="{Binding BackgroundPercent, StringFormat={}{0}%}" />
 
-                    <TextBlock Grid.Row="3" Style="{StaticResource LabelStyle}" Text="文字颜色" />
-                    <Button Grid.Row="3" Grid.Column="1" HorizontalAlignment="Left" Padding="10,5"
+                    <TextBlock Grid.Row="4" Style="{StaticResource LabelStyle}" Text="文字颜色" />
+                    <Button Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" Padding="10,5"
                             Content="纯黑" Click="OnBlackClick" />
-                    <Border Grid.Row="3" Grid.Column="1" Margin="60,0,60,0" Height="16" CornerRadius="8">
+                    <Border Grid.Row="4" Grid.Column="1" Margin="60,0,60,0" Height="16" CornerRadius="8">
                         <Border.Background>
                             <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
                                 <GradientStop Color="#FFFF3B30" Offset="0" />
@@ -157,17 +197,17 @@
                         <Slider Minimum="0" Maximum="360" Background="Transparent"
                                 Value="{Binding Hue, UpdateSourceTrigger=PropertyChanged}" />
                     </Border>
-                    <Button Grid.Row="3" Grid.Column="1" HorizontalAlignment="Right" Padding="10,5"
+                    <Button Grid.Row="4" Grid.Column="1" HorizontalAlignment="Right" Padding="10,5"
                             Content="纯白" Click="OnWhiteClick" />
 
-                    <CheckBox Grid.Row="4" Grid.ColumnSpan="2"
+                    <CheckBox Grid.Row="5" Grid.ColumnSpan="2"
                               IsChecked="{Binding AutoStartEnabled, UpdateSourceTrigger=PropertyChanged}"
                               Content="开机自启" />
-                    <Button Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Right"
+                    <Button Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Right"
                             Background="#FF3B67D9" BorderBrush="#FF5A82E7" Padding="16,7"
                             Content="锁定" Click="OnLockClick" />
                 </Grid>
             </Border>
-        </StackPanel>
+        </Grid>
     </Border>
 </Window>

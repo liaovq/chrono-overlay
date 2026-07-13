@@ -71,6 +71,10 @@ jobs:
           dotnet build ChronoOverlay.sln -c Release --no-restore
           dotnet test ChronoOverlay.sln -c Release --no-build
 
+      - name: Verify bundled font assets
+        shell: pwsh
+        run: ./scripts/Test-FontAssets.ps1
+
       - name: Publish Windows executable
         if: steps.meta.outputs.release_needed == 'true'
         shell: pwsh

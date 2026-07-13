@@ -205,7 +205,7 @@ export function App() {
               <span>01</span>
               <div>
                 <h3>解锁状态 · 自由定制</h3>
-                <p>字号、颜色、背景浓度和位置都能即时调整。</p>
+                <p>字号、特色等宽字体、颜色、背景浓度和位置都能即时调整。</p>
               </div>
             </div>
             <div className="demo-stage">
@@ -222,6 +222,7 @@ export function App() {
             <ul className="check-list">
               <li><CheckCircle weight="fill" />拖动到桌面的任意位置</li>
               <li><CheckCircle weight="fill" />分别调整时间与日期字号</li>
+              <li><CheckCircle weight="fill" />四款等宽字体即时切换并自动恢复</li>
               <li><CheckCircle weight="fill" />颜色和背景浓度即时生效</li>
             </ul>
           </article>
