@@ -10,9 +10,10 @@
     <AssemblyName>ChronoOverlay</AssemblyName>
     <RootNamespace>ChronoOverlay</RootNamespace>
     <PublishSingleFile>true</PublishSingleFile>
-    <SelfContained>true</SelfContained>
+    <SelfContained>false</SelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <PublishTrimmed>false</PublishTrimmed>
+    <SatelliteResourceLanguages>zh-Hans</SatelliteResourceLanguages>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <!-- WPF reads PerMonitorV2 from app.manifest. Suppress the WinForms-only guidance emitted
          because System.Windows.Forms is referenced solely for NotifyIcon and Screen interop. -->
