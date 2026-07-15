@@ -275,6 +275,17 @@ public sealed class SystemBehaviorTests
     }
 
     [Fact]
+    public void AuroraControlDockKeepsSelectedReferenceProportions()
+    {
+        Assert.Equal(420, ControlPanelShadowLayout.VisiblePanelWidth);
+        Assert.Equal(166, ControlPanelShadowLayout.VisiblePanelHeight);
+        Assert.Equal(444, ControlPanelShadowLayout.OuterWidth);
+        Assert.Equal(
+            ControlPanelShadowLayout.VisiblePanelWidth + (ControlPanelShadowLayout.HorizontalInset * 2),
+            ControlPanelShadowLayout.OuterWidth);
+    }
+
+    [Fact]
     public void HotspotToolWindowExplicitlyClearsClickThroughStyle()
     {
         const long wsExTransparent = 0x00000020L;

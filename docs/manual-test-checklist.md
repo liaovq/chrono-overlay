@@ -21,13 +21,15 @@ Record Windows version, monitor topology, DPI, executable path, and result for e
 
 ## Clock and controls
 
-- [ ] Confirm the unlocked panel uses the compact bright-silver frosted treatment: dark labels remain readable, rows and value columns align, and the panel is narrower than a wide clock surface.
-- [ ] Check the panel over both bright and dark wallpapers; the border, shadow, labels, sliders, color controls, checkbox, and lock button remain visually distinct.
+- [ ] Confirm the unlocked panel matches the Aurora Control Dock reference: a low, wide midnight-blue surface with two horizontal control rows and one compact footer.
+- [ ] Confirm the first row keeps the font selector, time size, and date size on one aligned grid; the second row keeps background concentration, circular percentage, hue rail, and black/white swatches aligned.
+- [ ] Confirm the footer contains only the compact auto-start toggle, centered “调整后自动保存” status, and the coral-to-violet lock action.
+- [ ] Check the panel over both bright and dark wallpapers; the blue edge, shadow, labels, sliders, circular swatches, toggle, and lock button remain visually distinct.
 - [ ] At 100%, 150%, and 200% DPI, confirm the compact panel does not clip labels, values, the font dropdown, color controls, or the lock button.
 - [ ] At 100%, 150%, and 200% DPI, compare both horizontal sides of the panel shadow: the right edge remains softly feathered rather than narrower or abruptly cut off.
 - [ ] With the panel below the clock, confirm the bottom shadow fades naturally instead of ending in a flat line at the window boundary.
 - [ ] Drag the clock near the work-area bottom so the panel flips above; confirm the top shadow remains complete and the clock right-side anchor does not visibly move through 10 above/below transitions.
-- [ ] Switch through all six font choices. Major Mono Display looks geometric and experimental; VT323 looks like a pixel terminal; time digits remain fixed-width and the Chinese date safely falls back when a font lacks Chinese glyphs.
+- [ ] Switch through all six font choices from the compact dark dropdown. Major Mono Display looks geometric and experimental; VT323 looks like a pixel terminal; time digits remain fixed-width and the Chinese date safely falls back when a font lacks Chinese glyphs.
 
 - [ ] Time is `HH:mm:ss`, updates on second boundaries, and does not shift horizontally.
 - [ ] Date is `yyyy.MM.dd 星期X` with the correct Chinese weekday.

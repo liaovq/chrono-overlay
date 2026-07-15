@@ -4,7 +4,7 @@
 
 ChronoOverlay is a .NET 8 WPF application targeting `win-x64`. Releases are framework-dependent single-file executables and require the x64 .NET 8 Desktop Runtime on the target computer. Keeping the shared WPF and .NET frameworks outside the application reduces the download from roughly 146 MiB to a small application-only executable.
 
-- `ClockWindow` renders the clock, date, background, and unlocked control panel.
+- `ClockWindow` renders the clock, date, background, and the low, wide Aurora control dock shown while unlocked.
 - `LockedHotspotWindow` is a transparent, topmost, non-activating window that covers only the measured time text rectangle.
 - `ClockViewModel` owns display state and settings bindings.
 - `ClockFontCatalog` resolves the system fallback and the five OFL-licensed fonts packaged as WPF resources.
