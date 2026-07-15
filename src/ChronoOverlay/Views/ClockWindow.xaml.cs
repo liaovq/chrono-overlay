@@ -456,6 +456,7 @@ public partial class ClockWindow : Window
         bool below = placement == ControlPanelPlacement.Below;
         Grid.SetRow(ClockSurface, below ? 0 : 1);
         Grid.SetRow(ControlPanel, below ? 1 : 0);
+        PanelChrome.Margin = ControlPanelShadowLayout.GetChromeMargin(placement);
         ControlPanel.Margin = below
             ? new Thickness(0, ControlPanelGapDip, 0, 0)
             : new Thickness(0, 0, 0, ControlPanelGapDip);

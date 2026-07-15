@@ -257,6 +257,23 @@ public sealed class SystemBehaviorTests
         Assert.Equal(ControlPanelPlacement.Above, placement);
     }
 
+    [Theory]
+    [InlineData(ControlPanelPlacement.Below, 0, 20)]
+    [InlineData(ControlPanelPlacement.Above, 20, 0)]
+    public void ControlPanelShadowInsetMovesToOuterWindowEdge(
+        ControlPanelPlacement placement,
+        double expectedTop,
+        double expectedBottom)
+    {
+        System.Windows.Thickness margin = ControlPanelShadowLayout.GetChromeMargin(placement);
+
+        Assert.Equal(12, margin.Left);
+        Assert.Equal(expectedTop, margin.Top);
+        Assert.Equal(12, margin.Right);
+        Assert.Equal(expectedBottom, margin.Bottom);
+        Assert.Equal(20, margin.Top + margin.Bottom);
+    }
+
     [Fact]
     public void HotspotToolWindowExplicitlyClearsClickThroughStyle()
     {

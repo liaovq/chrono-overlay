@@ -14,7 +14,7 @@ public static class ClockFontCatalog
         new(
             ClockFontIds.SystemMono,
             "系统等宽",
-            "Cascadia Mono / Consolas",
+            "系统默认",
             new MediaFontFamily("Cascadia Mono, Consolas")),
         new(
             ClockFontIds.JetBrainsMono,
@@ -31,6 +31,16 @@ public static class ClockFontCatalog
             "Space Mono",
             "复古醒目",
             Embedded("Space Mono")),
+        new(
+            ClockFontIds.MajorMonoDisplay,
+            "Major Mono Display",
+            "几何实验",
+            Embedded("Major Mono Display")),
+        new(
+            ClockFontIds.Vt323,
+            "VT323",
+            "像素终端",
+            Embedded("VT323")),
     ];
 
     public static ClockFontOption Resolve(string? id)

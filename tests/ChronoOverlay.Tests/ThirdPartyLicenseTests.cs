@@ -14,7 +14,9 @@ public sealed class ThirdPartyLicenseTests
     [
         "assets/fonts/licenses/ibmplexmono-ofl-1.1.txt",
         "assets/fonts/licenses/jetbrainsmono-ofl-1.1.txt",
+        "assets/fonts/licenses/majormonodisplay-ofl-1.1.txt",
         "assets/fonts/licenses/spacemono-ofl-1.1.txt",
+        "assets/fonts/licenses/vt323-ofl-1.1.txt",
         "assets/licenses/third-party-notices.md",
     ];
 
@@ -54,7 +56,7 @@ public sealed class ThirdPartyLicenseTests
             Assert.Contains(font.UpstreamUrl, content, StringComparison.Ordinal);
         }
 
-        Assert.Equal(3, CountOccurrences(content, "SIL OPEN FONT LICENSE Version 1.1"));
+        Assert.Equal(5, CountOccurrences(content, "SIL OPEN FONT LICENSE Version 1.1"));
     }
 
     [Fact]
@@ -67,7 +69,9 @@ public sealed class ThirdPartyLicenseTests
             Assert.Contains("JetBrains Mono", content, StringComparison.Ordinal);
             Assert.Contains("IBM Plex Mono", content, StringComparison.Ordinal);
             Assert.Contains("Space Mono", content, StringComparison.Ordinal);
-            Assert.Equal(3, CountOccurrences(content, "SIL OPEN FONT LICENSE Version 1.1"));
+            Assert.Contains("Major Mono Display", content, StringComparison.Ordinal);
+            Assert.Contains("VT323", content, StringComparison.Ordinal);
+            Assert.Equal(5, CountOccurrences(content, "SIL OPEN FONT LICENSE Version 1.1"));
         });
     }
 

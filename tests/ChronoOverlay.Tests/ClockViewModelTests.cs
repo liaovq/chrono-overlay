@@ -30,19 +30,26 @@ public sealed class ClockViewModelTests : IDisposable
         Assert.NotEqual("#FFFFFF", settings.TextColor);
     }
 
-    [Fact]
-    public void FontSelectionUpdatesSettingsAndResolvedFamily()
+    [Theory]
+    [InlineData(ClockFontIds.SpaceMono, "Space Mono")]
+    [InlineData(ClockFontIds.MajorMonoDisplay, "Major Mono Display")]
+    [InlineData(ClockFontIds.Vt323, "VT323")]
+    public void FontSelectionUpdatesPersistsAndResolvesFamily(string fontId, string familyName)
     {
         AppSettings settings = new();
         using SettingsService settingsService = new(_directory);
         using ClockViewModel viewModel = new(settings, new ClockService(), settingsService);
 
-        viewModel.SelectedFontId = ClockFontIds.SpaceMono;
+        viewModel.SelectedFontId = fontId;
+        viewModel.SaveImmediately();
 
-        Assert.Equal(ClockFontIds.SpaceMono, settings.ClockFontId);
-        Assert.Equal(ClockFontIds.SpaceMono, viewModel.SelectedFontId);
-        Assert.Contains("Space Mono", viewModel.SelectedFontFamily.Source, StringComparison.Ordinal);
-        Assert.Equal(4, viewModel.FontOptions.Count);
+        Assert.Equal(fontId, settings.ClockFontId);
+        Assert.Equal(fontId, viewModel.SelectedFontId);
+        Assert.Contains(familyName, viewModel.SelectedFontFamily.Source, StringComparison.Ordinal);
+        Assert.Equal(fontId, settingsService.Load().ClockFontId);
+        Assert.Equal(6, viewModel.FontOptions.Count);
+        Assert.Contains(viewModel.FontOptions, option => option.Id == ClockFontIds.MajorMonoDisplay);
+        Assert.Contains(viewModel.FontOptions, option => option.Id == ClockFontIds.Vt323);
     }
 
     public void Dispose()

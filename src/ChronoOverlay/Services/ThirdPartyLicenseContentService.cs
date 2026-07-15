@@ -28,6 +28,16 @@ public sealed class ThirdPartyLicenseContentService
             "Copyright 2016 The Space Mono Project Authors",
             "https://github.com/googlefonts/spacemono",
             "Assets/Fonts/Licenses/SpaceMono-OFL-1.1.txt"),
+        new(
+            "Major Mono Display",
+            "Copyright 2018 The Major Mono Project Authors",
+            "https://github.com/googlefonts/majormono",
+            "Assets/Fonts/Licenses/MajorMonoDisplay-OFL-1.1.txt"),
+        new(
+            "VT323",
+            "Copyright 2011, The VT323 Project Authors",
+            "https://github.com/phoikoi/VT323",
+            "Assets/Fonts/Licenses/VT323-OFL-1.1.txt"),
     ];
 
     private const string NoticesResourcePath = "Assets/Licenses/THIRD-PARTY-NOTICES.md";

@@ -2,6 +2,18 @@
 
 All notable changes are documented here. ChronoOverlay follows semantic versioning.
 
+## [0.1.3] - 2026-07-15
+
+### Added
+
+- Added Major Mono Display and VT323 as distinctive geometric and pixel-style clock font options.
+- Bundled both new fonts with complete OFL 1.1 license texts and pinned source provenance.
+- Refined the unlocked controls into a narrower bright-silver frosted panel with aligned labels, values, color controls, and matching buttons.
+
+### Fixed
+
+- Reserved transparent layout space for the panel shadow on the outer window edge, including after the panel flips above the clock.
+
 ## [0.1.2] - 2026-07-14
 
 ### Added
