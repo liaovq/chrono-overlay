@@ -14,12 +14,17 @@ Record Windows version, monitor topology, DPI, executable path, and result for e
 - [ ] At 100%, 150%, and 200% display scaling, confirm the notification-area icon remains recognizable and uses the same artwork.
 - [ ] Check the notification-area icon on both light and dark Windows taskbar themes; its silhouette and warm color layers remain visible.
 - [ ] Disconnect the network, open the tray menu, and confirm “第三方许可” opens a local WPF window without launching a browser.
-- [ ] Confirm the license window lists JetBrains Mono, IBM Plex Mono, and Space Mono with copyright holders and upstream URLs.
+- [ ] Confirm the license window lists JetBrains Mono, IBM Plex Mono, Space Mono, Major Mono Display, and VT323 with copyright holders and upstream URLs.
 - [ ] Search/select/copy text from the read-only license area and confirm each font section contains the complete “SIL OPEN FONT LICENSE Version 1.1” text.
 - [ ] Click “第三方许可” repeatedly and confirm only one license window exists; closing it leaves the clock and tray process running.
 - [ ] Repeat while the clock is locked and unlocked; opening/closing the license window does not change lock state, selective click-through, position, or topmost behavior.
 
 ## Clock and controls
+
+- [ ] Confirm the unlocked panel uses the compact bright-silver frosted treatment: dark labels remain readable, rows and value columns align, and the panel is narrower than a wide clock surface.
+- [ ] Check the panel over both bright and dark wallpapers; the border, shadow, labels, sliders, color controls, checkbox, and lock button remain visually distinct.
+- [ ] At 100%, 150%, and 200% DPI, confirm the compact panel does not clip labels, values, the font dropdown, color controls, or the lock button.
+- [ ] Switch through all six font choices. Major Mono Display looks geometric and experimental; VT323 looks like a pixel terminal; time digits remain fixed-width and the Chinese date safely falls back when a font lacks Chinese glyphs.
 
 - [ ] Time is `HH:mm:ss`, updates on second boundaries, and does not shift horizontally.
 - [ ] Date is `yyyy.MM.dd 星期X` with the correct Chinese weekday.

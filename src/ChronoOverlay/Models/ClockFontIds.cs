@@ -6,6 +6,8 @@ public static class ClockFontIds
     public const string JetBrainsMono = "jetbrains-mono";
     public const string IbmPlexMono = "ibm-plex-mono";
     public const string SpaceMono = "space-mono";
+    public const string MajorMonoDisplay = "major-mono-display";
+    public const string Vt323 = "vt323";
 
     public static readonly IReadOnlyList<string> All =
     [
@@ -13,6 +15,8 @@ public static class ClockFontIds
         JetBrainsMono,
         IbmPlexMono,
         SpaceMono,
+        MajorMonoDisplay,
+        Vt323,
     ];
 
     public static string Normalize(string? value) =>

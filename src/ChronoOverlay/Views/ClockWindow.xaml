@@ -15,27 +15,38 @@
         PreviewMouseMove="OnPreviewMouseMove"
         PreviewMouseLeftButtonUp="OnPreviewMouseLeftButtonUp">
     <Window.Resources>
+        <LinearGradientBrush x:Key="SilverPanelBrush" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#F4F8FAFC" Offset="0" />
+            <GradientStop Color="#EDE8EDF1" Offset="0.48" />
+            <GradientStop Color="#E7D9E0E6" Offset="1" />
+        </LinearGradientBrush>
         <Style TargetType="TextBlock">
             <Setter Property="FontFamily" Value="Segoe UI Variable Text, Segoe UI" />
             <Setter Property="Foreground" Value="#FFF4F6F8" />
         </Style>
         <Style x:Key="LabelStyle" TargetType="TextBlock">
             <Setter Property="FontSize" Value="12" />
-            <Setter Property="Foreground" Value="#FF9EA8B5" />
+            <Setter Property="Foreground" Value="#FF4C5762" />
             <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="HorizontalAlignment" Value="Right" />
+            <Setter Property="Margin" Value="0,0,2,0" />
         </Style>
         <Style x:Key="ValueStyle" TargetType="TextBlock" BasedOn="{StaticResource LabelStyle}">
-            <Setter Property="Foreground" Value="#FFDCE2E8" />
+            <Setter Property="Foreground" Value="#FF27313B" />
             <Setter Property="HorizontalAlignment" Value="Right" />
             <Setter Property="FontFamily" Value="Cascadia Mono, Consolas" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0" />
         </Style>
-        <Style TargetType="Button">
-            <Setter Property="Foreground" Value="#FFE6EBF0" />
-            <Setter Property="Background" Value="#FF252B33" />
-            <Setter Property="BorderBrush" Value="#FF39414B" />
+        <Style x:Key="GlassButtonStyle" TargetType="Button">
+            <Setter Property="Foreground" Value="#FF27313B" />
+            <Setter Property="Background" Value="#AFFFFFFF" />
+            <Setter Property="BorderBrush" Value="#C7FFFFFF" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Padding" Value="12,7" />
+            <Setter Property="Padding" Value="11,6" />
             <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -43,48 +54,65 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="5"
+                                CornerRadius="6"
                                 Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="ButtonBorder" Property="Background" Value="#FF303842" />
-                                <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="#FF596575" />
+                                <Setter TargetName="ButtonBorder" Property="Opacity" Value="0.82" />
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="ButtonBorder" Property="Background" Value="#FF1D2228" />
+                                <Setter TargetName="ButtonBorder" Property="Opacity" Value="0.65" />
                             </Trigger>
                             <Trigger Property="IsKeyboardFocused" Value="True">
-                                <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="#FF75A7FF" />
+                                <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="#FF4B78D1" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style TargetType="Button" BasedOn="{StaticResource GlassButtonStyle}" />
+        <Style x:Key="DarkSwatchButtonStyle" TargetType="Button" BasedOn="{StaticResource GlassButtonStyle}">
+            <Setter Property="Foreground" Value="#FFF8FAFC" />
+            <Setter Property="Background" Value="#FF2B333B" />
+            <Setter Property="BorderBrush" Value="#FF46515C" />
+        </Style>
+        <Style x:Key="LightSwatchButtonStyle" TargetType="Button" BasedOn="{StaticResource GlassButtonStyle}">
+            <Setter Property="Foreground" Value="#FF27313B" />
+            <Setter Property="Background" Value="#FFF9FBFC" />
+            <Setter Property="BorderBrush" Value="#FFFFFFFF" />
+        </Style>
+        <Style x:Key="PrimaryButtonStyle" TargetType="Button" BasedOn="{StaticResource GlassButtonStyle}">
+            <Setter Property="Foreground" Value="#FFFFFFFF" />
+            <Setter Property="Background" Value="#FF416FCB" />
+            <Setter Property="BorderBrush" Value="#FF7094DC" />
+            <Setter Property="Padding" Value="14,7" />
+        </Style>
         <Style TargetType="Slider">
             <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="MinWidth" Value="150" />
+            <Setter Property="MinWidth" Value="130" />
         </Style>
         <Style TargetType="CheckBox">
-            <Setter Property="Foreground" Value="#FFDCE2E8" />
+            <Setter Property="Foreground" Value="#FF34404B" />
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FontSize" Value="12" />
         </Style>
         <Style TargetType="ComboBox">
-            <Setter Property="Height" Value="27" />
-            <Setter Property="Foreground" Value="#FF1A1F25" />
-            <Setter Property="Background" Value="#FFF4F6F8" />
-            <Setter Property="BorderBrush" Value="#FF39414B" />
+            <Setter Property="Height" Value="29" />
+            <Setter Property="Foreground" Value="#FF26313B" />
+            <Setter Property="Background" Value="#D9FFFFFF" />
+            <Setter Property="BorderBrush" Value="#A8FFFFFF" />
             <Setter Property="Padding" Value="8,3" />
             <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="MaxDropDownHeight" Value="240" />
+            <Setter Property="MaxDropDownHeight" Value="260" />
         </Style>
         <Style TargetType="ComboBoxItem">
-            <Setter Property="Foreground" Value="#FF1A1F25" />
-            <Setter Property="Background" Value="#FFF4F6F8" />
+            <Setter Property="Foreground" Value="#FF26313B" />
+            <Setter Property="Background" Value="#FFF3F6F8" />
             <Setter Property="Padding" Value="8,5" />
         </Style>
     </Window.Resources>
@@ -123,40 +151,49 @@
             <Border x:Name="ControlPanel"
                     Grid.Row="1"
                     Margin="0,6,0,0"
-                    Padding="14"
-                    Background="#F21A1F25"
-                    BorderBrush="#FF303740"
+                    Width="346"
+                    HorizontalAlignment="Right"
+                    Padding="12,10"
+                    Background="{StaticResource SilverPanelBrush}"
+                    BorderBrush="#EFFFFFFF"
                     BorderThickness="1"
-                    CornerRadius="8">
-                <Grid MinWidth="340">
+                    CornerRadius="10">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="22" Direction="270" ShadowDepth="7"
+                                      Color="#FF101820" Opacity="0.32" />
+                </Border.Effect>
+                <Grid Width="320">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="74" />
+                        <ColumnDefinition Width="66" />
                         <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="48" />
+                        <ColumnDefinition Width="42" />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="32" />
                         <RowDefinition Height="32" />
-                        <RowDefinition Height="32" />
+                        <RowDefinition Height="36" />
                         <RowDefinition Height="32" />
                         <RowDefinition Height="42" />
-                        <RowDefinition Height="42" />
+                        <RowDefinition Height="40" />
                     </Grid.RowDefinitions>
 
                     <TextBlock Grid.Row="0" Style="{StaticResource LabelStyle}" Text="时间字号" />
                     <Slider Grid.Row="0" Grid.Column="1" Minimum="32" Maximum="128"
+                            Margin="8,0"
                             Value="{Binding TimeFontSize, UpdateSourceTrigger=PropertyChanged}" />
                     <TextBlock Grid.Row="0" Grid.Column="2" Style="{StaticResource ValueStyle}"
                                Text="{Binding TimeFontSize, StringFormat={}{0:0}px}" />
 
                     <TextBlock Grid.Row="1" Style="{StaticResource LabelStyle}" Text="日期字号" />
                     <Slider Grid.Row="1" Grid.Column="1" Minimum="16" Maximum="64"
+                            Margin="8,0"
                             Value="{Binding DateFontSize, UpdateSourceTrigger=PropertyChanged}" />
                     <TextBlock Grid.Row="1" Grid.Column="2" Style="{StaticResource ValueStyle}"
                                Text="{Binding DateFontSize, StringFormat={}{0:0}px}" />
 
                     <TextBlock Grid.Row="2" Style="{StaticResource LabelStyle}" Text="字体" />
                     <ComboBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2"
+                              Margin="8,0,0,0"
                               ItemsSource="{Binding FontOptions}"
                               SelectedValuePath="Id"
                               SelectedValue="{Binding SelectedFontId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
@@ -165,9 +202,9 @@
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="{Binding DisplayName}"
                                                FontFamily="{Binding FontFamily}"
-                                               Foreground="#FF1A1F25" />
-                                    <TextBlock Text="{Binding Description, StringFormat={}  · {0}}"
-                                               Margin="8,0,0,0" Foreground="#FF59636F" />
+                                               Foreground="#FF26313B" />
+                                    <TextBlock Text="{Binding Description, StringFormat={} · {0}}"
+                                               Margin="7,0,0,0" Foreground="#FF66717B" />
                                 </StackPanel>
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
@@ -175,37 +212,51 @@
 
                     <TextBlock Grid.Row="3" Style="{StaticResource LabelStyle}" Text="背景浓度" />
                     <Slider Grid.Row="3" Grid.Column="1" Minimum="0" Maximum="1" TickFrequency="0.01"
+                            Margin="8,0"
                             Value="{Binding BackgroundOpacity, UpdateSourceTrigger=PropertyChanged}" />
                     <TextBlock Grid.Row="3" Grid.Column="2" Style="{StaticResource ValueStyle}"
                                Text="{Binding BackgroundPercent, StringFormat={}{0}%}" />
 
                     <TextBlock Grid.Row="4" Style="{StaticResource LabelStyle}" Text="文字颜色" />
-                    <Button Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" Padding="10,5"
-                            Content="纯黑" Click="OnBlackClick" />
-                    <Border Grid.Row="4" Grid.Column="1" Margin="60,0,60,0" Height="16" CornerRadius="8">
-                        <Border.Background>
-                            <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
-                                <GradientStop Color="#FFFF3B30" Offset="0" />
-                                <GradientStop Color="#FFFFCC00" Offset="0.17" />
-                                <GradientStop Color="#FF34C759" Offset="0.33" />
-                                <GradientStop Color="#FF32ADE6" Offset="0.5" />
-                                <GradientStop Color="#FF007AFF" Offset="0.67" />
-                                <GradientStop Color="#FFAF52DE" Offset="0.83" />
-                                <GradientStop Color="#FFFF3B30" Offset="1" />
-                            </LinearGradientBrush>
-                        </Border.Background>
-                        <Slider Minimum="0" Maximum="360" Background="Transparent"
-                                Value="{Binding Hue, UpdateSourceTrigger=PropertyChanged}" />
-                    </Border>
-                    <Button Grid.Row="4" Grid.Column="1" HorizontalAlignment="Right" Padding="10,5"
-                            Content="纯白" Click="OnWhiteClick" />
+                    <Grid Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="8,0,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="48" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="48" />
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" Style="{StaticResource DarkSwatchButtonStyle}"
+                                Padding="7,5" Content="纯黑" Click="OnBlackClick" />
+                        <Border Grid.Column="1" Margin="8,0" Height="16" CornerRadius="8"
+                                BorderBrush="#80FFFFFF" BorderThickness="1">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
+                                    <GradientStop Color="#FFFF3B30" Offset="0" />
+                                    <GradientStop Color="#FFFFCC00" Offset="0.17" />
+                                    <GradientStop Color="#FF34C759" Offset="0.33" />
+                                    <GradientStop Color="#FF32ADE6" Offset="0.5" />
+                                    <GradientStop Color="#FF007AFF" Offset="0.67" />
+                                    <GradientStop Color="#FFAF52DE" Offset="0.83" />
+                                    <GradientStop Color="#FFFF3B30" Offset="1" />
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <Slider Minimum="0" Maximum="360" MinWidth="80" Background="Transparent"
+                                    Value="{Binding Hue, UpdateSourceTrigger=PropertyChanged}" />
+                        </Border>
+                        <Button Grid.Column="2" Style="{StaticResource LightSwatchButtonStyle}"
+                                Padding="7,5" Content="纯白" Click="OnWhiteClick" />
+                    </Grid>
 
-                    <CheckBox Grid.Row="5" Grid.ColumnSpan="2"
-                              IsChecked="{Binding AutoStartEnabled, UpdateSourceTrigger=PropertyChanged}"
-                              Content="开机自启" />
-                    <Button Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Right"
-                            Background="#FF3B67D9" BorderBrush="#FF5A82E7" Padding="16,7"
-                            Content="锁定" Click="OnLockClick" />
+                    <Grid Grid.Row="5" Grid.ColumnSpan="3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <CheckBox Grid.Column="0"
+                                  IsChecked="{Binding AutoStartEnabled, UpdateSourceTrigger=PropertyChanged}"
+                                  Content="开机自启" />
+                        <Button Grid.Column="1" Style="{StaticResource PrimaryButtonStyle}"
+                                Content="锁定" Click="OnLockClick" />
+                    </Grid>
                 </Grid>
             </Border>
         </Grid>
