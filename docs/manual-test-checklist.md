@@ -24,6 +24,9 @@ Record Windows version, monitor topology, DPI, executable path, and result for e
 - [ ] Confirm the unlocked panel uses the compact bright-silver frosted treatment: dark labels remain readable, rows and value columns align, and the panel is narrower than a wide clock surface.
 - [ ] Check the panel over both bright and dark wallpapers; the border, shadow, labels, sliders, color controls, checkbox, and lock button remain visually distinct.
 - [ ] At 100%, 150%, and 200% DPI, confirm the compact panel does not clip labels, values, the font dropdown, color controls, or the lock button.
+- [ ] At 100%, 150%, and 200% DPI, compare both horizontal sides of the panel shadow: the right edge remains softly feathered rather than narrower or abruptly cut off.
+- [ ] With the panel below the clock, confirm the bottom shadow fades naturally instead of ending in a flat line at the window boundary.
+- [ ] Drag the clock near the work-area bottom so the panel flips above; confirm the top shadow remains complete and the clock right-side anchor does not visibly move through 10 above/below transitions.
 - [ ] Switch through all six font choices. Major Mono Display looks geometric and experimental; VT323 looks like a pixel terminal; time digits remain fixed-width and the Chinese date safely falls back when a font lacks Chinese glyphs.
 
 - [ ] Time is `HH:mm:ss`, updates on second boundaries, and does not shift horizontally.

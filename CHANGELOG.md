@@ -10,6 +10,10 @@ All notable changes are documented here. ChronoOverlay follows semantic versioni
 - Bundled both new fonts with complete OFL 1.1 license texts and pinned source provenance.
 - Refined the unlocked controls into a narrower bright-silver frosted panel with aligned labels, values, color controls, and matching buttons.
 
+### Fixed
+
+- Reserved transparent layout space for the panel shadow on the outer window edge, including after the panel flips above the clock.
+
 ## [0.1.2] - 2026-07-14
 
 ### Added

@@ -148,21 +148,25 @@
                 </StackPanel>
             </Grid>
 
-            <Border x:Name="ControlPanel"
-                    Grid.Row="1"
-                    Margin="0,6,0,0"
-                    Width="346"
-                    HorizontalAlignment="Right"
-                    Padding="12,10"
-                    Background="{StaticResource SilverPanelBrush}"
-                    BorderBrush="#EFFFFFFF"
-                    BorderThickness="1"
-                    CornerRadius="10">
-                <Border.Effect>
-                    <DropShadowEffect BlurRadius="22" Direction="270" ShadowDepth="7"
-                                      Color="#FF101820" Opacity="0.32" />
-                </Border.Effect>
-                <Grid Width="320">
+            <Grid x:Name="ControlPanel"
+                  Grid.Row="1"
+                  Margin="0,6,0,0"
+                  Width="370"
+                  HorizontalAlignment="Right"
+                  Background="Transparent">
+                <Border x:Name="PanelChrome"
+                        Width="346"
+                        Margin="12,0,12,20"
+                        Padding="12,10"
+                        Background="{StaticResource SilverPanelBrush}"
+                        BorderBrush="#EFFFFFFF"
+                        BorderThickness="1"
+                        CornerRadius="10">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="22" Direction="270" ShadowDepth="7"
+                                          Color="#FF101820" Opacity="0.32" />
+                    </Border.Effect>
+                    <Grid Width="320">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="66" />
                         <ColumnDefinition Width="*" />
@@ -257,8 +261,9 @@
                         <Button Grid.Column="1" Style="{StaticResource PrimaryButtonStyle}"
                                 Content="锁定" Click="OnLockClick" />
                     </Grid>
-                </Grid>
-            </Border>
+                    </Grid>
+                </Border>
+            </Grid>
         </Grid>
     </Border>
 </Window>
