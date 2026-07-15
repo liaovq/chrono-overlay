@@ -1,50 +1,80 @@
-# ChronoOverlay website design QA
+# ChronoOverlay Aurora Control Dock — Design QA
 
-- Source visual truth: `docs/design-source-desktop-context.png`
-- Desktop implementation evidence: `docs/site-desktop-top-final.png`, `docs/site-desktop-experience-final.png`, `docs/site-desktop-download.png`
-- Mobile implementation evidence: `docs/site-mobile-final.png`
-- Combined comparison evidence: `docs/design-qa-hero-comparison.png`, `docs/design-qa-feature-comparison.png`
-- Desktop viewport: 1280 × 720 (browser default; segmented screenshots cover hero, state comparison, and download CTA)
-- Mobile viewport: 390 × 844
-- Theme/state: dark theme, unlocked customization panel visible; locked/unlocked interaction verified separately
+The earlier GitHub Pages QA report is preserved at `docs/website-design-qa.md`.
+
+- Source visual truth: [`docs/design/aurora-control-dock-reference.png`](docs/design/aurora-control-dock-reference.png)
+- Implementation screenshot: [`docs/design/aurora-control-dock-implementation-150.png`](docs/design/aurora-control-dock-implementation-150.png)
+- Full-view comparison: [`docs/design/aurora-control-dock-comparison-150.png`](docs/design/aurora-control-dock-comparison-150.png)
+- Keyboard-focus evidence: [`docs/design/aurora-control-dock-focus-150.png`](docs/design/aurora-control-dock-focus-150.png)
+- Dynamic anchor evidence: [`docs/design/aurora-control-dock-anchor-results.txt`](docs/design/aurora-control-dock-anchor-results.txt)
+- Viewport/state: Windows 11, 150% DPI, unlocked, Major Mono Display, 72px time, 31px date, 0% background concentration.
+- Comparison normalization: the source dock was cropped from the selected concept and normalized to `630×252`; the WPF dock was captured with `PrintWindow` at native 150% DPI as `630×249`.
 
 ## Findings
 
 No actionable P0, P1, or P2 differences remain.
 
-- Typography: the implementation uses Segoe UI Variable with Cascadia Mono/Consolas tabular numerals. It preserves the source's strong display hierarchy, right-aligned clock, compact metadata, and Chinese text density. The mobile hero heading was reduced after the first pass to prevent clipping.
-- Spacing and layout rhythm: the desktop hero, two-column state comparison, privacy note, and centered final CTA follow the source composition. Section spacing is deliberately generous and the product surfaces use the source's restrained 8–13px radii rather than a generic card stack.
-- Colors and visual tokens: near-black navy surfaces, cool-blue unlocked accents, green locked-state accents, muted copy, and low-contrast borders match the source direction. Contrast remains readable without introducing the source's disallowed neon treatment.
-- Image quality and asset fidelity: the hero uses a dedicated 1672 × 941 generated desktop still-life asset (`site/src/assets/hero-desktop-context.png`) matching the selected source. Product UI remains live HTML rather than a fake screenshot. Phosphor icons provide a consistent, licensed icon family; no custom SVG or placeholder imagery is used.
-- Copy and content: product name, Chinese positioning, v0.1.0, Windows support, privacy statement, selective click-through limitation, and download action are coherent and consistent with the application requirements.
-- Responsiveness: desktop has no horizontal overflow. Mobile 390px has no horizontal overflow, clipped heading, or off-screen CTA after the second pass.
-- Accessibility and behavior: semantic headings, links, labels, outputs, checkbox, and range inputs are present. Keyboard focus renders a 2px solid outline. Reduced-motion preference disables nonessential movement.
+- [P3] Native text rasterization is slightly heavier than the generated reference.
+  - Location: compact labels and the selected-font preview.
+  - Evidence: WPF/DirectWrite renders Segoe UI Variable and the embedded Major Mono Display, while the reference is a generated raster.
+  - Decision: accepted; font hierarchy, baseline alignment, fit, and native sharpness remain correct.
+- [P3] Runtime state intentionally differs from the static mock where the mock is internally inconsistent.
+  - Location: background slider, hue thumb, and auto-start toggle.
+  - Evidence: the mock shows a `0%` label with a mid-track opacity thumb; the implementation truthfully places `0%` at the start and reflects the saved hue and auto-start settings.
+  - Decision: accepted; geometry matches the target without presenting false state.
 
-## Interaction verification
+## Required Fidelity Surfaces
 
-- Download links resolve to `https://github.com/liaovq/chrono-overlay/releases/download/v0.1.0/ChronoOverlay-v0.1.0-win-x64.exe`.
-- GitHub links resolve to the public repository.
-- Time updates once per second and uses a 24-hour, seconds-visible format.
-- Lock button hides the interactive control panel.
-- Double-clicking the locked demo restores the control panel.
-- Browser console warnings/errors: none.
+- Fonts and typography: passed. Major Mono Display, compact numeric values, Chinese labels, weights, baselines, and truncation remain readable without clipping.
+- Spacing and layout rhythm: passed. The visible dock is `420×166` DIP. Content is arranged by a full-size grid, while the 1 DIP outline is a non-layout overlay, so the content receives the full intended size.
+- Colors and visual tokens: passed. Midnight surface, blue-violet edge, muted tracks, purple-blue active tracks, rainbow hue rail, circular swatches, and coral-violet lock action match the selected direction.
+- Image quality and asset fidelity: passed. The dock has no raster UI assets. Chevron and lock glyphs use the Windows-provided Segoe MDL2 Assets font and remain aligned with the source.
+- Copy and content: passed. Every existing setting is present, the selected target's hierarchy is preserved, and no unrelated feature was introduced.
+- Accessibility and interaction states: passed for the implemented visual states. Black and white swatches have explicit automation names. Both custom slider templates expose a high-contrast keyboard focus ring, shown in the committed focus capture.
 
-## Comparison history
+## Comparison History
 
-### Pass 1
+### Iteration 1
 
-- [P2] Mobile hero title clipped beyond the right edge at 390px.
-- Fix: changed the mobile title scale from `clamp(44px, 14vw, 66px)` to `clamp(40px, 11.5vw, 48px)` and tightened letter spacing.
+- P1: the font column was too wide and the time column too narrow.
+- P2: slider thumbs, opacity dial, swatches, toggle, and lock action were oversized.
+- Fix: remapped the first row to `184 / 1 / 110 / 1 / 96` DIP and reduced control geometry to the normalized target measurements.
 
-### Pass 2
+### Iteration 2
 
-- Evidence: `docs/site-mobile-final.png` reports heading right edge 354.67px within the 375px document viewport and zero horizontal overflow.
-- Result: no remaining P0/P1/P2 findings.
+- P2: time/date values were right-aligned instead of sitting beside their labels.
+- P2: the opacity dial and color group were shifted right; the footer status was not centered.
+- Fix: switched values to inline label groups, shifted the dial and color controls to measured positions, and centered the footer status across the dock.
 
-## Follow-up polish
+### Review remediation pass
 
-- [P3] A future iteration could add a lightweight section-reveal animation, but it is intentionally omitted for the quiet, low-distraction brief and reduced-motion simplicity.
+- P1: continuous time/date resizing changed the `SizeToContent` window bounds and made the dock drift or repeatedly re-evaluate above/below placement.
+- Fix: capture the visible dock's physical top-right coordinate before the bound clock property updates, coalesce render work, restore that coordinate after layout, and persist only the corrected final geometry through the debounced writer.
+- Evidence: six time-size transitions and five date-size transitions, including minimum and maximum values, all recorded `delta=0,0` physical pixels.
+- P1: Segoe Fluent Icons is not included by default on Windows 10.
+- Fix: changed E70D ChevronDown and E72E Lock to Segoe MDL2 Assets, which ships with supported Windows versions.
+- P1: a `420×166` content grid was nested inside a bordered `420×166` container, leaving only `418×164` DIP of layout space.
+- Fix: changed the visible panel to a `420×166` grid with an independent background surface and non-layout outline overlay.
+- P2: visual QA evidence was local-only and color swatches lacked accessible names.
+- Fix: committed normalized reference, implementation, comparison, focus-state, and anchor evidence; added automation names and slider focus visuals.
 
-## Final result
+### Final pass
+
+- Re-captured the production WPF surface with embedded fonts at native 150% DPI.
+- Opened the reference and implementation together in the committed comparison image and inspected typography, grid geometry, dividers, radii, outline, controls, icon alignment, palette, and copy.
+- No P0/P1/P2 visual mismatch remains.
+
+## Interaction Verification
+
+- The isolated WPF run exercised time sizes `32, 72, 128, 72, 32, 128` and date sizes `16, 31, 64, 24, 64`; the dock top-right coordinate remained exactly fixed for every transition.
+- Existing bindings remain active for font, time size, date size, opacity, hue, black, white, auto-start, and lock.
+- The focused-slider capture confirms the custom template exposes a visible keyboard focus outline.
+- Selective click-through, time-only hotspot, clock anchoring during lock transitions, panel flipping, tray behavior, and persistence remain intact.
+- Windows 10 glyph presence and full keyboard traversal remain explicit RC manual-test items because the local visual run used Windows 11.
+
+## Follow-up Polish
+
+- Recheck the edge glow against a very bright wallpaper at 100% and 200% DPI using the latest PR RC artifact.
+- Treat remaining DirectWrite hinting differences as native-platform rendering rather than design drift.
 
 final result: passed

@@ -4,7 +4,7 @@
 
 ChronoOverlay is a .NET 8 WPF application targeting `win-x64`. Releases are framework-dependent single-file executables and require the x64 .NET 8 Desktop Runtime on the target computer. Keeping the shared WPF and .NET frameworks outside the application reduces the download from roughly 146 MiB to a small application-only executable.
 
-- `ClockWindow` renders the clock, date, background, and unlocked control panel.
+- `ClockWindow` renders the clock, date, background, and the low, wide Aurora control dock shown while unlocked.
 - `LockedHotspotWindow` is a transparent, topmost, non-activating window that covers only the measured time text rectangle.
 - `ClockViewModel` owns display state and settings bindings.
 - `ClockFontCatalog` resolves the system fallback and the five OFL-licensed fonts packaged as WPF resources.
@@ -29,6 +29,8 @@ The hotspot window deliberately renders a visually imperceptible but non-zero-al
 Lock and unlock transitions capture the physical top-right anchor of `ClockSurface`, change the `SizeToContent` layout, then compensate the native window position before the hotspot or settings are synchronized. This keeps the visible clock fixed even when the control panel is wider than the clock.
 
 While unlocked, `ControlPanelPlacementMath` compares the measured physical panel height with the active monitor's physical work area. It keeps the panel below when possible, flips it above when the lower edge would be clipped, and preserves the clock anchor during the row swap.
+
+When a font or either font-size setting changes, the dock itself becomes the stable visual reference. The window captures the visible dock's physical top-right coordinate before WPF updates its `SizeToContent` layout, then restores that coordinate after the render pass. This keeps the controls stationary while only the clock surface grows or shrinks, coalesces rapid slider updates, and persists the final corrected clock placement with the existing debounced settings writer.
 
 ## Startup and single instance
 

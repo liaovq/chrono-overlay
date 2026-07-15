@@ -28,4 +28,10 @@
     <ProjectReference Include="..\..\src\ChronoOverlay\ChronoOverlay.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="..\..\src\ChronoOverlay\Views\ClockWindow.xaml"
+             Link="TestAssets\ClockWindow.xaml"
+             CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

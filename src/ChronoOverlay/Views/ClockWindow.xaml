@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:services="clr-namespace:ChronoOverlay.Services"
         mc:Ignorable="d"
         AllowsTransparency="True"
         Background="Transparent"
@@ -15,105 +16,355 @@
         PreviewMouseMove="OnPreviewMouseMove"
         PreviewMouseLeftButtonUp="OnPreviewMouseLeftButtonUp">
     <Window.Resources>
-        <LinearGradientBrush x:Key="SilverPanelBrush" StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Color="#F4F8FAFC" Offset="0" />
-            <GradientStop Color="#EDE8EDF1" Offset="0.48" />
-            <GradientStop Color="#E7D9E0E6" Offset="1" />
+        <LinearGradientBrush x:Key="DockSurfaceBrush" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#F51B2D46" Offset="0" />
+            <GradientStop Color="#F414263D" Offset="0.55" />
+            <GradientStop Color="#F3102035" Offset="1" />
         </LinearGradientBrush>
+        <LinearGradientBrush x:Key="ActiveTrackBrush" StartPoint="0,0.5" EndPoint="1,0.5">
+            <GradientStop Color="#FFB05CFF" Offset="0" />
+            <GradientStop Color="#FF5976FF" Offset="0.52" />
+            <GradientStop Color="#FF4DA5F4" Offset="1" />
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="LockButtonBrush" StartPoint="0,0.5" EndPoint="1,0.5">
+            <GradientStop Color="#FFFF5D79" Offset="0" />
+            <GradientStop Color="#FFDB3CB4" Offset="0.54" />
+            <GradientStop Color="#FF7428D8" Offset="1" />
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="HueBrush" StartPoint="0,0.5" EndPoint="1,0.5">
+            <GradientStop Color="#FFFF3B30" Offset="0" />
+            <GradientStop Color="#FFFFCC00" Offset="0.17" />
+            <GradientStop Color="#FF34C759" Offset="0.33" />
+            <GradientStop Color="#FF32D6C6" Offset="0.5" />
+            <GradientStop Color="#FF007AFF" Offset="0.67" />
+            <GradientStop Color="#FFAF52DE" Offset="0.83" />
+            <GradientStop Color="#FFFF2D8D" Offset="1" />
+        </LinearGradientBrush>
+
         <Style TargetType="TextBlock">
             <Setter Property="FontFamily" Value="Segoe UI Variable Text, Segoe UI" />
-            <Setter Property="Foreground" Value="#FFF4F6F8" />
+            <Setter Property="Foreground" Value="#FFF3F5FA" />
         </Style>
-        <Style x:Key="LabelStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="12" />
-            <Setter Property="Foreground" Value="#FF4C5762" />
+        <Style x:Key="DockLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="10.5" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="Foreground" Value="#FFE9EDF5" />
             <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="HorizontalAlignment" Value="Right" />
-            <Setter Property="Margin" Value="0,0,2,0" />
         </Style>
-        <Style x:Key="ValueStyle" TargetType="TextBlock" BasedOn="{StaticResource LabelStyle}">
-            <Setter Property="Foreground" Value="#FF27313B" />
-            <Setter Property="HorizontalAlignment" Value="Right" />
+        <Style x:Key="DockValueStyle" TargetType="TextBlock">
             <Setter Property="FontFamily" Value="Cascadia Mono, Consolas" />
+            <Setter Property="FontSize" Value="11.5" />
             <Setter Property="FontWeight" Value="SemiBold" />
-            <Setter Property="Margin" Value="0" />
+            <Setter Property="Foreground" Value="#FFF8FAFF" />
+            <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
-        <Style x:Key="GlassButtonStyle" TargetType="Button">
-            <Setter Property="Foreground" Value="#FF27313B" />
-            <Setter Property="Background" Value="#AFFFFFFF" />
-            <Setter Property="BorderBrush" Value="#C7FFFFFF" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Padding" Value="11,6" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="FontSize" Value="12" />
-            <Setter Property="FontWeight" Value="SemiBold" />
+
+        <ControlTemplate x:Key="TrackButtonTemplate" TargetType="RepeatButton">
+            <Border Height="4"
+                    VerticalAlignment="Center"
+                    Background="{TemplateBinding Background}"
+                    CornerRadius="2" />
+        </ControlTemplate>
+        <ControlTemplate x:Key="DockThumbTemplate" TargetType="Thumb">
+            <Grid Width="11" Height="11">
+                <Ellipse Fill="#FFF8FAFD" Stroke="#FFD7DEE8" StrokeThickness="1">
+                    <Ellipse.Effect>
+                        <DropShadowEffect BlurRadius="4" ShadowDepth="1" Opacity="0.38" Color="#FF050A12" />
+                    </Ellipse.Effect>
+                </Ellipse>
+            </Grid>
+        </ControlTemplate>
+        <Style x:Key="DockSliderStyle" TargetType="Slider">
+            <Setter Property="Height" Value="20" />
+            <Setter Property="VerticalAlignment" Value="Center" />
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="ButtonBorder"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="6"
-                                Padding="{TemplateBinding Padding}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                        </Border>
+                    <ControlTemplate TargetType="Slider">
+                        <Grid Height="20" VerticalAlignment="Center">
+                            <Border x:Name="KeyboardFocusRing"
+                                    Margin="-3,2"
+                                    BorderBrush="Transparent"
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    IsHitTestVisible="False" />
+                            <Track x:Name="PART_Track" VerticalAlignment="Center">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Background="{StaticResource ActiveTrackBrush}"
+                                                  Command="{x:Static Slider.DecreaseLarge}"
+                                                  IsTabStop="False"
+                                                  Template="{StaticResource TrackButtonTemplate}" />
+                                </Track.DecreaseRepeatButton>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Background="#FF4B5869"
+                                                  Command="{x:Static Slider.IncreaseLarge}"
+                                                  IsTabStop="False"
+                                                  Template="{StaticResource TrackButtonTemplate}" />
+                                </Track.IncreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb Template="{StaticResource DockThumbTemplate}" />
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
                         <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="ButtonBorder" Property="Opacity" Value="0.82" />
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="ButtonBorder" Property="Opacity" Value="0.65" />
-                            </Trigger>
                             <Trigger Property="IsKeyboardFocused" Value="True">
-                                <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="#FF4B78D1" />
+                                <Setter TargetName="KeyboardFocusRing" Property="BorderBrush" Value="#FFF5F7FF" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
-        <Style TargetType="Button" BasedOn="{StaticResource GlassButtonStyle}" />
-        <Style x:Key="DarkSwatchButtonStyle" TargetType="Button" BasedOn="{StaticResource GlassButtonStyle}">
-            <Setter Property="Foreground" Value="#FFF8FAFC" />
-            <Setter Property="Background" Value="#FF2B333B" />
-            <Setter Property="BorderBrush" Value="#FF46515C" />
+        <Style x:Key="HueSliderStyle" TargetType="Slider" BasedOn="{StaticResource DockSliderStyle}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Slider">
+                        <Grid Height="20" VerticalAlignment="Center">
+                            <Border x:Name="KeyboardFocusRing"
+                                    Margin="-3,2"
+                                    BorderBrush="Transparent"
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    IsHitTestVisible="False" />
+                            <Border Height="6"
+                                    VerticalAlignment="Center"
+                                    Background="{StaticResource HueBrush}"
+                                    BorderBrush="#CCFFFFFF"
+                                    BorderThickness="0.75"
+                                    CornerRadius="3" />
+                            <Track x:Name="PART_Track" VerticalAlignment="Center">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Background="Transparent"
+                                                  Command="{x:Static Slider.DecreaseLarge}"
+                                                  IsTabStop="False"
+                                                  Template="{StaticResource TrackButtonTemplate}" />
+                                </Track.DecreaseRepeatButton>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Background="Transparent"
+                                                  Command="{x:Static Slider.IncreaseLarge}"
+                                                  IsTabStop="False"
+                                                  Template="{StaticResource TrackButtonTemplate}" />
+                                </Track.IncreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb Template="{StaticResource DockThumbTemplate}" />
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="KeyboardFocusRing" Property="BorderBrush" Value="#FFF5F7FF" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
-        <Style x:Key="LightSwatchButtonStyle" TargetType="Button" BasedOn="{StaticResource GlassButtonStyle}">
-            <Setter Property="Foreground" Value="#FF27313B" />
-            <Setter Property="Background" Value="#FFF9FBFC" />
-            <Setter Property="BorderBrush" Value="#FFFFFFFF" />
+
+        <Style x:Key="DockComboBoxItemStyle" TargetType="ComboBoxItem">
+            <Setter Property="Foreground" Value="#FFF2F5FA" />
+            <Setter Property="Background" Value="#FF17283E" />
+            <Setter Property="Padding" Value="9,6" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBoxItem">
+                        <Border x:Name="ItemBorder"
+                                Padding="{TemplateBinding Padding}"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="4">
+                            <ContentPresenter />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="ItemBorder" Property="Background" Value="#FF294263" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="ItemBorder" Property="Background" Value="#FF334D75" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
-        <Style x:Key="PrimaryButtonStyle" TargetType="Button" BasedOn="{StaticResource GlassButtonStyle}">
-            <Setter Property="Foreground" Value="#FFFFFFFF" />
-            <Setter Property="Background" Value="#FF416FCB" />
-            <Setter Property="BorderBrush" Value="#FF7094DC" />
-            <Setter Property="Padding" Value="14,7" />
-        </Style>
-        <Style TargetType="Slider">
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="MinWidth" Value="130" />
-        </Style>
-        <Style TargetType="CheckBox">
-            <Setter Property="Foreground" Value="#FF34404B" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="FontSize" Value="12" />
-        </Style>
-        <Style TargetType="ComboBox">
-            <Setter Property="Height" Value="29" />
-            <Setter Property="Foreground" Value="#FF26313B" />
-            <Setter Property="Background" Value="#D9FFFFFF" />
-            <Setter Property="BorderBrush" Value="#A8FFFFFF" />
-            <Setter Property="Padding" Value="8,3" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="Cursor" Value="Hand" />
+        <Style x:Key="DockComboBoxStyle" TargetType="ComboBox">
+            <Setter Property="Height" Value="23" />
+            <Setter Property="Foreground" Value="#FFF2F5FA" />
+            <Setter Property="Background" Value="#A90E1B2B" />
+            <Setter Property="BorderBrush" Value="#FF52647B" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Padding" Value="8,0,18,0" />
             <Setter Property="MaxDropDownHeight" Value="260" />
+            <Setter Property="ItemContainerStyle" Value="{StaticResource DockComboBoxItemStyle}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <Border x:Name="ComboBorder"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="5" />
+                            <ContentPresenter Margin="{TemplateBinding Padding}"
+                                              VerticalAlignment="Center"
+                                              IsHitTestVisible="False"
+                                              Content="{TemplateBinding SelectionBoxItem}"
+                                              ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" />
+                            <TextBlock Margin="0,0,9,0"
+                                       HorizontalAlignment="Right"
+                                       VerticalAlignment="Center"
+                                       FontFamily="Segoe MDL2 Assets"
+                                       FontSize="10"
+                                       Foreground="#FFABB6C6"
+                                       Text="&#xE70D;"
+                                       IsHitTestVisible="False" />
+                            <ToggleButton Background="Transparent"
+                                          BorderThickness="0"
+                                          Focusable="False"
+                                          IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                          ClickMode="Press">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Border Background="Transparent" />
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+                            <Popup x:Name="PART_Popup"
+                                   AllowsTransparency="True"
+                                   Focusable="False"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}"
+                                   Placement="Bottom"
+                                   PopupAnimation="Fade">
+                                <Border Margin="0,3,0,0"
+                                        MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
+                                        Padding="3"
+                                        Background="#FF17283E"
+                                        BorderBrush="#FF52647B"
+                                        BorderThickness="1"
+                                        CornerRadius="6">
+                                    <Border.Effect>
+                                        <DropShadowEffect BlurRadius="14" ShadowDepth="5" Opacity="0.5" Color="#FF050A12" />
+                                    </Border.Effect>
+                                    <ScrollViewer MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                        <ItemsPresenter />
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                <Setter TargetName="ComboBorder" Property="BorderBrush" Value="#FF8EA2FF" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.55" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
-        <Style TargetType="ComboBoxItem">
-            <Setter Property="Foreground" Value="#FF26313B" />
-            <Setter Property="Background" Value="#FFF3F6F8" />
-            <Setter Property="Padding" Value="8,5" />
+
+        <Style x:Key="SwatchButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="21" />
+            <Setter Property="Height" Value="21" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <Ellipse x:Name="SwatchRing"
+                                     Fill="#24121C2B"
+                                     Stroke="#FF71829A"
+                                     StrokeThickness="1" />
+                            <Ellipse Margin="3"
+                                     Fill="{TemplateBinding Background}"
+                                     Stroke="#D9FFFFFF"
+                                     StrokeThickness="0.75" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="SwatchRing" Property="Stroke" Value="#FFA8B7FF" />
+                                <Setter TargetName="SwatchRing" Property="StrokeThickness" Value="2" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="SwatchRing" Property="Stroke" Value="#FFFFFFFF" />
+                                <Setter TargetName="SwatchRing" Property="StrokeThickness" Value="2" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="AutoStartToggleStyle" TargetType="ToggleButton">
+            <Setter Property="Width" Value="30" />
+            <Setter Property="Height" Value="18" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border x:Name="ToggleTrack"
+                                Background="#FF435164"
+                                BorderBrush="#FF68788E"
+                                BorderThickness="1"
+                                CornerRadius="9">
+                            <Ellipse x:Name="ToggleKnob"
+                                     Width="12"
+                                     Height="12"
+                                     Margin="2"
+                                     HorizontalAlignment="Left"
+                                     Fill="#FFF7F9FC">
+                                <Ellipse.Effect>
+                                    <DropShadowEffect BlurRadius="3" ShadowDepth="1" Opacity="0.35" />
+                                </Ellipse.Effect>
+                            </Ellipse>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="ToggleTrack" Property="Background" Value="#FF6654E8" />
+                                <Setter TargetName="ToggleTrack" Property="BorderBrush" Value="#FF9286FF" />
+                                <Setter TargetName="ToggleKnob" Property="HorizontalAlignment" Value="Right" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ToggleTrack" Property="Opacity" Value="0.88" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="ToggleTrack" Property="BorderBrush" Value="#FFFFFFFF" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="LockButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="66" />
+            <Setter Property="Height" Value="24" />
+            <Setter Property="Foreground" Value="#FFFFFFFF" />
+            <Setter Property="FontSize" Value="10.5" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="LockBorder"
+                                Background="{StaticResource LockButtonBrush}"
+                                BorderBrush="#A8FFFFFF"
+                                BorderThickness="0.75"
+                                CornerRadius="6">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="LockBorder" Property="Opacity" Value="0.88" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="LockBorder" Property="Opacity" Value="0.7" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="LockBorder" Property="BorderBrush" Value="#FFFFFFFF" />
+                                <Setter TargetName="LockBorder" Property="BorderThickness" Value="1.5" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
     </Window.Resources>
 
@@ -123,6 +374,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
+
             <Grid x:Name="ClockSurface" Grid.Row="0" Margin="0">
                 <Border Background="#FF000000"
                         CornerRadius="8"
@@ -150,119 +402,241 @@
 
             <Grid x:Name="ControlPanel"
                   Grid.Row="1"
+                  Width="{x:Static services:ControlPanelShadowLayout.OuterWidth}"
                   Margin="0,6,0,0"
-                  Width="370"
                   HorizontalAlignment="Right"
                   Background="Transparent">
-                <Border x:Name="PanelChrome"
-                        Width="346"
-                        Margin="12,0,12,20"
-                        Padding="12,10"
-                        Background="{StaticResource SilverPanelBrush}"
-                        BorderBrush="#EFFFFFFF"
-                        BorderThickness="1"
-                        CornerRadius="10">
-                    <Border.Effect>
-                        <DropShadowEffect BlurRadius="22" Direction="270" ShadowDepth="7"
-                                          Color="#FF101820" Opacity="0.32" />
-                    </Border.Effect>
-                    <Grid Width="320">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="66" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="42" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="32" />
-                        <RowDefinition Height="32" />
-                        <RowDefinition Height="36" />
-                        <RowDefinition Height="32" />
-                        <RowDefinition Height="42" />
-                        <RowDefinition Height="40" />
-                    </Grid.RowDefinitions>
+                <Grid x:Name="PanelChrome"
+                      Width="{x:Static services:ControlPanelShadowLayout.VisiblePanelWidth}"
+                      Height="{x:Static services:ControlPanelShadowLayout.VisiblePanelHeight}"
+                      Margin="12,0,12,20">
+                    <Border x:Name="PanelSurface"
+                            Background="{StaticResource DockSurfaceBrush}"
+                            CornerRadius="12">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="24"
+                                              Direction="270"
+                                              ShadowDepth="8"
+                                              Color="#FF07101F"
+                                              Opacity="0.6" />
+                        </Border.Effect>
+                    </Border>
+                    <Grid x:Name="PanelContent">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="64" />
+                            <RowDefinition Height="1" />
+                            <RowDefinition Height="60" />
+                            <RowDefinition Height="1" />
+                            <RowDefinition Height="40" />
+                        </Grid.RowDefinitions>
 
-                    <TextBlock Grid.Row="0" Style="{StaticResource LabelStyle}" Text="时间字号" />
-                    <Slider Grid.Row="0" Grid.Column="1" Minimum="32" Maximum="128"
-                            Margin="8,0"
-                            Value="{Binding TimeFontSize, UpdateSourceTrigger=PropertyChanged}" />
-                    <TextBlock Grid.Row="0" Grid.Column="2" Style="{StaticResource ValueStyle}"
-                               Text="{Binding TimeFontSize, StringFormat={}{0:0}px}" />
+                        <Grid Grid.Row="0" Margin="14,10,14,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="184" />
+                                <ColumnDefinition Width="1" />
+                                <ColumnDefinition Width="110" />
+                                <ColumnDefinition Width="1" />
+                                <ColumnDefinition Width="96" />
+                            </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Row="1" Style="{StaticResource LabelStyle}" Text="日期字号" />
-                    <Slider Grid.Row="1" Grid.Column="1" Minimum="16" Maximum="64"
-                            Margin="8,0"
-                            Value="{Binding DateFontSize, UpdateSourceTrigger=PropertyChanged}" />
-                    <TextBlock Grid.Row="1" Grid.Column="2" Style="{StaticResource ValueStyle}"
-                               Text="{Binding DateFontSize, StringFormat={}{0:0}px}" />
+                            <Grid Grid.Column="0" Margin="0,0,12,0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="23" />
+                                    <RowDefinition Height="23" />
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Row="0" Style="{StaticResource DockLabelStyle}" Text="字体" />
+                                <ComboBox Grid.Row="1"
+                                          Style="{StaticResource DockComboBoxStyle}"
+                                          AutomationProperties.Name="字体"
+                                          ItemsSource="{Binding FontOptions}"
+                                          SelectedValuePath="Id"
+                                          SelectedValue="{Binding SelectedFontId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding DisplayName}"
+                                                           FontFamily="{Binding FontFamily}"
+                                                           FontSize="8.5"
+                                                           Foreground="#FFF2F5FA" />
+                                                <TextBlock Text="{Binding Description, StringFormat={} · {0}}"
+                                                           Margin="6,0,0,0"
+                                                           FontSize="8"
+                                                           Foreground="#FFAFB9C8" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </Grid>
 
-                    <TextBlock Grid.Row="2" Style="{StaticResource LabelStyle}" Text="字体" />
-                    <ComboBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2"
-                              Margin="8,0,0,0"
-                              ItemsSource="{Binding FontOptions}"
-                              SelectedValuePath="Id"
-                              SelectedValue="{Binding SelectedFontId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="{Binding DisplayName}"
-                                               FontFamily="{Binding FontFamily}"
-                                               Foreground="#FF26313B" />
-                                    <TextBlock Text="{Binding Description, StringFormat={} · {0}}"
-                                               Margin="7,0,0,0" Foreground="#FF66717B" />
+                            <Border Grid.Column="1" Width="1" Margin="0,0,0,0" Background="#425D6D82" />
+
+                            <Grid Grid.Column="2" Margin="12,0,11,0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="23" />
+                                    <RowDefinition Height="23" />
+                                </Grid.RowDefinitions>
+                                <StackPanel Grid.Row="0" Orientation="Horizontal">
+                                    <TextBlock Style="{StaticResource DockLabelStyle}" Text="时间" />
+                                    <TextBlock Margin="7,0,0,0"
+                                               Style="{StaticResource DockValueStyle}"
+                                               Text="{Binding TimeFontSize, StringFormat={}{0:0}}" />
                                 </StackPanel>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
+                                <Slider Grid.Row="1"
+                                        Style="{StaticResource DockSliderStyle}"
+                                        AutomationProperties.Name="时间字号"
+                                        Minimum="32"
+                                        Maximum="128"
+                                        Value="{Binding TimeFontSize, UpdateSourceTrigger=PropertyChanged}" />
+                            </Grid>
 
-                    <TextBlock Grid.Row="3" Style="{StaticResource LabelStyle}" Text="背景浓度" />
-                    <Slider Grid.Row="3" Grid.Column="1" Minimum="0" Maximum="1" TickFrequency="0.01"
-                            Margin="8,0"
-                            Value="{Binding BackgroundOpacity, UpdateSourceTrigger=PropertyChanged}" />
-                    <TextBlock Grid.Row="3" Grid.Column="2" Style="{StaticResource ValueStyle}"
-                               Text="{Binding BackgroundPercent, StringFormat={}{0}%}" />
+                            <Border Grid.Column="3" Width="1" Background="#425D6D82" />
 
-                    <TextBlock Grid.Row="4" Style="{StaticResource LabelStyle}" Text="文字颜色" />
-                    <Grid Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Margin="8,0,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="48" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="48" />
-                        </Grid.ColumnDefinitions>
-                        <Button Grid.Column="0" Style="{StaticResource DarkSwatchButtonStyle}"
-                                Padding="7,5" Content="纯黑" Click="OnBlackClick" />
-                        <Border Grid.Column="1" Margin="8,0" Height="16" CornerRadius="8"
-                                BorderBrush="#80FFFFFF" BorderThickness="1">
-                            <Border.Background>
-                                <LinearGradientBrush StartPoint="0,0.5" EndPoint="1,0.5">
-                                    <GradientStop Color="#FFFF3B30" Offset="0" />
-                                    <GradientStop Color="#FFFFCC00" Offset="0.17" />
-                                    <GradientStop Color="#FF34C759" Offset="0.33" />
-                                    <GradientStop Color="#FF32ADE6" Offset="0.5" />
-                                    <GradientStop Color="#FF007AFF" Offset="0.67" />
-                                    <GradientStop Color="#FFAF52DE" Offset="0.83" />
-                                    <GradientStop Color="#FFFF3B30" Offset="1" />
-                                </LinearGradientBrush>
-                            </Border.Background>
-                            <Slider Minimum="0" Maximum="360" MinWidth="80" Background="Transparent"
-                                    Value="{Binding Hue, UpdateSourceTrigger=PropertyChanged}" />
+                            <Grid Grid.Column="4" Margin="12,0,0,0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="23" />
+                                    <RowDefinition Height="23" />
+                                </Grid.RowDefinitions>
+                                <StackPanel Grid.Row="0" Orientation="Horizontal">
+                                    <TextBlock Style="{StaticResource DockLabelStyle}" Text="日期" />
+                                    <TextBlock Margin="7,0,0,0"
+                                               Style="{StaticResource DockValueStyle}"
+                                               Text="{Binding DateFontSize, StringFormat={}{0:0}}" />
+                                </StackPanel>
+                                <Slider Grid.Row="1"
+                                        Style="{StaticResource DockSliderStyle}"
+                                        AutomationProperties.Name="日期字号"
+                                        Minimum="16"
+                                        Maximum="64"
+                                        Value="{Binding DateFontSize, UpdateSourceTrigger=PropertyChanged}" />
+                            </Grid>
+                        </Grid>
+
+                        <Border Grid.Row="1" Margin="14,0" Background="#455D6D82" />
+
+                        <Grid Grid.Row="2" Margin="14,6,14,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="128" />
+                                <ColumnDefinition Width="58" />
+                                <ColumnDefinition Width="1" />
+                                <ColumnDefinition Width="205" />
+                            </Grid.ColumnDefinitions>
+
+                            <Grid Grid.Column="0" Margin="0,0,6,0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="21" />
+                                    <RowDefinition Height="28" />
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Row="0" Style="{StaticResource DockLabelStyle}" Text="背景浓度" />
+                                <Slider Grid.Row="1"
+                                        Style="{StaticResource DockSliderStyle}"
+                                        AutomationProperties.Name="背景浓度"
+                                        Minimum="0"
+                                        Maximum="1"
+                                        TickFrequency="0.01"
+                                        Value="{Binding BackgroundOpacity, UpdateSourceTrigger=PropertyChanged}" />
+                            </Grid>
+
+                            <Grid Grid.Column="1" Margin="-4,0,4,0">
+                                <Ellipse Width="35"
+                                         Height="35"
+                                         Fill="#180A1422"
+                                         Stroke="#FF536176"
+                                         StrokeThickness="3" />
+                                <TextBlock HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           FontFamily="Cascadia Mono, Consolas"
+                                           FontSize="10.5"
+                                           FontWeight="SemiBold"
+                                           Text="{Binding BackgroundPercent, StringFormat={}{0}%}" />
+                            </Grid>
+
+                            <Border Grid.Column="2" Width="1" Margin="0,0,0,0" Background="#425D6D82" />
+
+                            <Grid Grid.Column="3" Margin="9,0,0,0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="21" />
+                                    <RowDefinition Height="28" />
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Row="0" Style="{StaticResource DockLabelStyle}" Text="文字颜色" />
+                                <Grid Grid.Row="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="27" />
+                                        <ColumnDefinition Width="21" />
+                                    </Grid.ColumnDefinitions>
+                                    <Slider Grid.Column="0"
+                                            Margin="0,0,9,0"
+                                            Style="{StaticResource HueSliderStyle}"
+                                            AutomationProperties.Name="文字颜色色相"
+                                            Minimum="0"
+                                            Maximum="360"
+                                            Value="{Binding Hue, UpdateSourceTrigger=PropertyChanged}" />
+                                    <Button Grid.Column="1"
+                                            Style="{StaticResource SwatchButtonStyle}"
+                                            AutomationProperties.Name="纯黑"
+                                            HorizontalAlignment="Left"
+                                            Background="#FF000000"
+                                            ToolTip="纯黑"
+                                            Click="OnBlackClick" />
+                                    <Button Grid.Column="2"
+                                            Style="{StaticResource SwatchButtonStyle}"
+                                            AutomationProperties.Name="纯白"
+                                            Background="#FFFFFFFF"
+                                            ToolTip="纯白"
+                                            Click="OnWhiteClick" />
+                                </Grid>
+                            </Grid>
+                        </Grid>
+
+                        <Border Grid.Row="3" Background="#455D6D82" />
+
+                        <Border Grid.Row="4" Background="#65101E32" CornerRadius="0,0,12,12">
+                            <Grid Margin="14,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <ToggleButton Grid.Column="0"
+                                              Style="{StaticResource AutoStartToggleStyle}"
+                                              IsChecked="{Binding AutoStartEnabled, UpdateSourceTrigger=PropertyChanged}"
+                                              AutomationProperties.Name="开机自启" />
+                                <TextBlock Grid.Column="1"
+                                           Margin="9,0,0,0"
+                                           Style="{StaticResource DockLabelStyle}"
+                                           Foreground="#FFD7DEEA"
+                                           Text="开机自启" />
+                                <TextBlock Grid.Column="0"
+                                           Grid.ColumnSpan="4"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           IsHitTestVisible="False"
+                                           FontSize="9.5"
+                                           Foreground="#FF8F9BAD"
+                                           Text="调整后自动保存" />
+                                <Button Grid.Column="3"
+                                        Style="{StaticResource LockButtonStyle}"
+                                        AutomationProperties.Name="锁定"
+                                        Click="OnLockClick">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Margin="0,0,6,0"
+                                                   VerticalAlignment="Center"
+                                                   FontFamily="Segoe MDL2 Assets"
+                                                   FontSize="10"
+                                                   Text="&#xE72E;" />
+                                        <TextBlock VerticalAlignment="Center" Text="锁定" />
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
                         </Border>
-                        <Button Grid.Column="2" Style="{StaticResource LightSwatchButtonStyle}"
-                                Padding="7,5" Content="纯白" Click="OnWhiteClick" />
                     </Grid>
-
-                    <Grid Grid.Row="5" Grid.ColumnSpan="3">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <CheckBox Grid.Column="0"
-                                  IsChecked="{Binding AutoStartEnabled, UpdateSourceTrigger=PropertyChanged}"
-                                  Content="开机自启" />
-                        <Button Grid.Column="1" Style="{StaticResource PrimaryButtonStyle}"
-                                Content="锁定" Click="OnLockClick" />
-                    </Grid>
-                    </Grid>
-                </Border>
+                    <Border x:Name="PanelOutline"
+                            BorderBrush="#E08EA2F4"
+                            BorderThickness="1"
+                            CornerRadius="12"
+                            IsHitTestVisible="False" />
+                </Grid>
             </Grid>
         </Grid>
     </Border>

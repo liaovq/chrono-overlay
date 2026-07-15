@@ -21,19 +21,28 @@ Record Windows version, monitor topology, DPI, executable path, and result for e
 
 ## Clock and controls
 
-- [ ] Confirm the unlocked panel uses the compact bright-silver frosted treatment: dark labels remain readable, rows and value columns align, and the panel is narrower than a wide clock surface.
-- [ ] Check the panel over both bright and dark wallpapers; the border, shadow, labels, sliders, color controls, checkbox, and lock button remain visually distinct.
+- [ ] Confirm the unlocked panel matches the Aurora Control Dock reference: a low, wide midnight-blue surface with two horizontal control rows and one compact footer.
+- [ ] Confirm the first row keeps the font selector, time size, and date size on one aligned grid; the second row keeps background concentration, circular percentage, hue rail, and black/white swatches aligned.
+- [ ] Confirm the footer contains only the compact auto-start toggle, centered “调整后自动保存” status, and the coral-to-violet lock action.
+- [ ] Check the panel over both bright and dark wallpapers; the blue edge, shadow, labels, sliders, circular swatches, toggle, and lock button remain visually distinct.
 - [ ] At 100%, 150%, and 200% DPI, confirm the compact panel does not clip labels, values, the font dropdown, color controls, or the lock button.
 - [ ] At 100%, 150%, and 200% DPI, compare both horizontal sides of the panel shadow: the right edge remains softly feathered rather than narrower or abruptly cut off.
 - [ ] With the panel below the clock, confirm the bottom shadow fades naturally instead of ending in a flat line at the window boundary.
 - [ ] Drag the clock near the work-area bottom so the panel flips above; confirm the top shadow remains complete and the clock right-side anchor does not visibly move through 10 above/below transitions.
-- [ ] Switch through all six font choices. Major Mono Display looks geometric and experimental; VT323 looks like a pixel terminal; time digits remain fixed-width and the Chinese date safely falls back when a font lacks Chinese glyphs.
+- [ ] Switch through all six font choices from the compact dark dropdown. Major Mono Display looks geometric and experimental; VT323 looks like a pixel terminal; time digits remain fixed-width and the Chinese date safely falls back when a font lacks Chinese glyphs.
 
 - [ ] Time is `HH:mm:ss`, updates on second boundaries, and does not shift horizontally.
 - [ ] Date is `yyyy.MM.dd 星期X` with the correct Chinese weekday.
 - [ ] Time and date remain strictly right-aligned at minimum and maximum sizes.
 - [ ] Time/date size sliders, background concentration, hue, pure black, and pure white update immediately.
+- [ ] Place a visible reference at the control dock's top-right corner, then drag the time-size slider continuously from 32px to 128px and back; the dock does not move or flip while only the clock region grows or shrinks.
+- [ ] Repeat the fixed-dock check with the date-size slider from 16px to 64px, with the dock both below and above the clock, and at 100%, 150%, and 200% DPI.
+- [ ] Change the selected font while watching the same reference point; the dock remains fixed while the clock text reflows.
 - [ ] Slider interaction never starts a window drag.
+- [ ] On Windows 10, confirm the font dropdown chevron and lock icon are visible and use the same glyphs as Windows 11.
+- [ ] Use Tab to reach the font selector, all four sliders, pure-black and pure-white swatches, auto-start toggle, and lock action; every focused control has a visible focus indication.
+- [ ] With a slider focused, use Left/Right, Home/End, and Page Up/Page Down to change its value; the dock remains fixed and the value updates immediately.
+- [ ] Use Space/Enter to operate the black/white swatches, auto-start toggle, and lock action, and confirm a screen reader announces the black and white buttons by name.
 - [ ] Non-control areas drag only after the Windows drag threshold.
 - [ ] Double-clicking time while unlocked locks without starting a drag.
 - [ ] At 32px, 72px, and 128px time sizes, place a visible reference at the clock surface's top-right corner, lock/unlock 10 times, and confirm the corner does not visibly move.

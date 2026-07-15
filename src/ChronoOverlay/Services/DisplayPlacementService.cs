@@ -160,9 +160,12 @@ public sealed class DisplayPlacementService
         return true;
     }
 
-    public void PreserveClockAnchor(Window window, FrameworkElement clockSurface, DrawingPoint desiredAnchor)
+    public void PreserveClockAnchor(Window window, FrameworkElement clockSurface, DrawingPoint desiredAnchor) =>
+        PreserveTopRightAnchor(window, clockSurface, desiredAnchor);
+
+    public void PreserveTopRightAnchor(Window window, FrameworkElement element, DrawingPoint desiredAnchor)
     {
-        DrawingPoint currentAnchor = GetClockAnchorPhysical(clockSurface);
+        DrawingPoint currentAnchor = GetTopRightAnchorPhysical(element);
         Rectangle windowRect = GetWindowPhysicalRect(window);
         DrawingPoint target = DisplayPlacementMath.PreserveAnchor(windowRect.Location, currentAnchor, desiredAnchor);
         WindowStyleService.SetPhysicalPosition(window, target.X, target.Y);
@@ -191,10 +194,13 @@ public sealed class DisplayPlacementService
         settings.WindowY = window.Top;
     }
 
-    public static DrawingPoint GetClockAnchorPhysical(FrameworkElement clockSurface)
+    public static DrawingPoint GetClockAnchorPhysical(FrameworkElement clockSurface) =>
+        GetTopRightAnchorPhysical(clockSurface);
+
+    public static DrawingPoint GetTopRightAnchorPhysical(FrameworkElement element)
     {
-        System.Windows.Point screenPoint = clockSurface.PointToScreen(
-            new System.Windows.Point(clockSurface.ActualWidth, 0));
+        System.Windows.Point screenPoint = element.PointToScreen(
+            new System.Windows.Point(element.ActualWidth, 0));
         return new DrawingPoint((int)Math.Round(screenPoint.X), (int)Math.Round(screenPoint.Y));
     }
 

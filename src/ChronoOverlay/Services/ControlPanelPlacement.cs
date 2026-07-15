@@ -44,6 +44,9 @@ public static class ControlPanelShadowLayout
 {
     public const double HorizontalInset = 12;
     public const double OuterVerticalInset = 20;
+    public const double VisiblePanelWidth = 420;
+    public const double VisiblePanelHeight = 166;
+    public const double OuterWidth = VisiblePanelWidth + (HorizontalInset * 2);
 
     public static Thickness GetChromeMargin(ControlPanelPlacement placement) => placement switch
     {

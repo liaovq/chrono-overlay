@@ -2,6 +2,18 @@
 
 All notable changes are documented here. ChronoOverlay follows semantic versioning.
 
+## [0.1.4] - 2026-07-15
+
+### Changed
+
+- Rebuilt the unlocked controls as the low, wide Aurora Control Dock selected from the Product Design exploration.
+- Grouped typography, size, opacity, and color controls into two precise horizontal rows with an auto-save footer.
+- Replaced generic WPF form chrome with custom midnight surfaces, aligned separators, compact sliders, circular swatches, a native toggle, and a focused gradient lock action.
+
+### Fixed
+
+- Kept the selected visual proportions at 420×166 DIP while preserving the existing clock anchor, above/below placement, and shadow-safe outer spacing.
+
 ## [0.1.3] - 2026-07-15
 
 ### Added
