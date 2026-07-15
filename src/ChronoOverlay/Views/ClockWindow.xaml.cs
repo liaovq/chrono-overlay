@@ -29,6 +29,8 @@ public partial class ClockWindow : Window
     private bool _allowClose;
     private bool _layoutTransition;
     private bool _panelPlacementPending;
+    private bool _panelAnchorRestorePending;
+    private DrawingPoint? _pendingPanelTopRightAnchor;
     private ControlPanelPlacement _controlPanelPlacement = ControlPanelPlacement.Below;
 
     public ClockWindow(
@@ -44,6 +46,7 @@ public partial class ClockWindow : Window
         _hotspotWindow = new LockedHotspotWindow();
 
         InitializeComponent();
+        _viewModel.PropertyChanged += OnViewModelPropertyChanged;
         DataContext = viewModel;
         ShowActivated = startupMode == StartupMode.Interactive && !viewModel.IsLocked;
         if (viewModel.IsLocked)
@@ -279,6 +282,84 @@ public partial class ClockWindow : Window
         SavePlacement();
     }
 
+    private void CapturePlacementDebounced()
+    {
+        if (!IsLoaded || _layoutTransition)
+        {
+            return;
+        }
+
+        _placementService.Capture(this, ClockSurface, _viewModel.Settings);
+        _settingsService.SaveDebounced(_viewModel.Settings);
+    }
+
+    private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs eventArgs)
+    {
+        if (eventArgs.PropertyName is not (
+                nameof(ClockViewModel.TimeFontSize) or
+                nameof(ClockViewModel.DateFontSize) or
+                nameof(ClockViewModel.SelectedFontFamily)))
+        {
+            return;
+        }
+
+        PreserveControlPanelPositionAcrossClockResize();
+    }
+
+    private void PreserveControlPanelPositionAcrossClockResize()
+    {
+        if (_layoutTransition ||
+            _viewModel.IsLocked ||
+            !IsLoaded ||
+            !ControlPanel.IsVisible ||
+            PanelChrome.ActualWidth <= 0 ||
+            PanelChrome.ActualHeight <= 0)
+        {
+            return;
+        }
+
+        _pendingPanelTopRightAnchor ??= DisplayPlacementService.GetTopRightAnchorPhysical(PanelChrome);
+        ScheduleControlPanelAnchorRestore();
+    }
+
+    private void ScheduleControlPanelAnchorRestore()
+    {
+        if (_panelAnchorRestorePending || _pendingPanelTopRightAnchor is null)
+        {
+            return;
+        }
+
+        _panelAnchorRestorePending = true;
+        Dispatcher.BeginInvoke(DispatcherPriority.Render, new Action(() =>
+        {
+            _panelAnchorRestorePending = false;
+            DrawingPoint? desiredAnchor = _pendingPanelTopRightAnchor;
+            if (desiredAnchor is null ||
+                _viewModel.IsLocked ||
+                !IsLoaded ||
+                !ControlPanel.IsVisible)
+            {
+                _pendingPanelTopRightAnchor = null;
+                return;
+            }
+
+            _layoutTransition = true;
+            try
+            {
+                UpdateLayout();
+                _placementService.PreserveTopRightAnchor(this, PanelChrome, desiredAnchor.Value);
+                UpdateLayout();
+            }
+            finally
+            {
+                _layoutTransition = false;
+                _pendingPanelTopRightAnchor = null;
+            }
+
+            CapturePlacementDebounced();
+        }));
+    }
+
     private void OnLocationChanged(object? sender, EventArgs eventArgs)
     {
         if (_viewModel.IsLocked && !_layoutTransition)
@@ -295,7 +376,14 @@ public partial class ClockWindow : Window
         }
         else if (!_layoutTransition)
         {
-            ScheduleControlPanelPlacement();
+            if (_pendingPanelTopRightAnchor is not null)
+            {
+                ScheduleControlPanelAnchorRestore();
+            }
+            else
+            {
+                ScheduleControlPanelPlacement();
+            }
         }
     }
 
@@ -384,7 +472,10 @@ public partial class ClockWindow : Window
 
     private void ScheduleControlPanelPlacement()
     {
-        if (_panelPlacementPending || !IsLoaded || _viewModel.IsLocked)
+        if (_panelPlacementPending ||
+            _pendingPanelTopRightAnchor is not null ||
+            !IsLoaded ||
+            _viewModel.IsLocked)
         {
             return;
         }
@@ -393,6 +484,12 @@ public partial class ClockWindow : Window
         Dispatcher.BeginInvoke(DispatcherPriority.Render, new Action(() =>
         {
             _panelPlacementPending = false;
+            if (_pendingPanelTopRightAnchor is not null)
+            {
+                ScheduleControlPanelAnchorRestore();
+                return;
+            }
+
             if (RepositionControlPanelPreservingClockAnchor())
             {
                 CaptureAndSavePlacement();
@@ -473,6 +570,7 @@ public partial class ClockWindow : Window
 
     private void OnClosed(object? sender, EventArgs eventArgs)
     {
+        _viewModel.PropertyChanged -= OnViewModelPropertyChanged;
         _hwndSource?.RemoveHook(WindowMessageHook);
         _hwndSource = null;
     }

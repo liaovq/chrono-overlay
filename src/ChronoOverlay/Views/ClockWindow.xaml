@@ -81,6 +81,12 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Slider">
                         <Grid Height="20" VerticalAlignment="Center">
+                            <Border x:Name="KeyboardFocusRing"
+                                    Margin="-3,2"
+                                    BorderBrush="Transparent"
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    IsHitTestVisible="False" />
                             <Track x:Name="PART_Track" VerticalAlignment="Center">
                                 <Track.DecreaseRepeatButton>
                                     <RepeatButton Background="{StaticResource ActiveTrackBrush}"
@@ -99,6 +105,11 @@
                                 </Track.Thumb>
                             </Track>
                         </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="KeyboardFocusRing" Property="BorderBrush" Value="#FFF5F7FF" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -108,6 +119,12 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Slider">
                         <Grid Height="20" VerticalAlignment="Center">
+                            <Border x:Name="KeyboardFocusRing"
+                                    Margin="-3,2"
+                                    BorderBrush="Transparent"
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    IsHitTestVisible="False" />
                             <Border Height="6"
                                     VerticalAlignment="Center"
                                     Background="{StaticResource HueBrush}"
@@ -132,6 +149,11 @@
                                 </Track.Thumb>
                             </Track>
                         </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="KeyboardFocusRing" Property="BorderBrush" Value="#FFF5F7FF" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -189,7 +211,7 @@
                             <TextBlock Margin="0,0,9,0"
                                        HorizontalAlignment="Right"
                                        VerticalAlignment="Center"
-                                       FontFamily="Segoe Fluent Icons"
+                                       FontFamily="Segoe MDL2 Assets"
                                        FontSize="10"
                                        Foreground="#FFABB6C6"
                                        Text="&#xE70D;"
@@ -384,23 +406,22 @@
                   Margin="0,6,0,0"
                   HorizontalAlignment="Right"
                   Background="Transparent">
-                <Border x:Name="PanelChrome"
-                        Width="{x:Static services:ControlPanelShadowLayout.VisiblePanelWidth}"
-                        Height="{x:Static services:ControlPanelShadowLayout.VisiblePanelHeight}"
-                        Margin="12,0,12,20"
-                        Background="{StaticResource DockSurfaceBrush}"
-                        BorderBrush="#E08EA2F4"
-                        BorderThickness="1"
-                        CornerRadius="12">
-                    <Border.Effect>
-                        <DropShadowEffect BlurRadius="24"
-                                          Direction="270"
-                                          ShadowDepth="8"
-                                          Color="#FF07101F"
-                                          Opacity="0.6" />
-                    </Border.Effect>
-                    <Grid Width="{x:Static services:ControlPanelShadowLayout.VisiblePanelWidth}"
-                          Height="{x:Static services:ControlPanelShadowLayout.VisiblePanelHeight}">
+                <Grid x:Name="PanelChrome"
+                      Width="{x:Static services:ControlPanelShadowLayout.VisiblePanelWidth}"
+                      Height="{x:Static services:ControlPanelShadowLayout.VisiblePanelHeight}"
+                      Margin="12,0,12,20">
+                    <Border x:Name="PanelSurface"
+                            Background="{StaticResource DockSurfaceBrush}"
+                            CornerRadius="12">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="24"
+                                              Direction="270"
+                                              ShadowDepth="8"
+                                              Color="#FF07101F"
+                                              Opacity="0.6" />
+                        </Border.Effect>
+                    </Border>
+                    <Grid x:Name="PanelContent">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="64" />
                             <RowDefinition Height="1" />
@@ -426,6 +447,7 @@
                                 <TextBlock Grid.Row="0" Style="{StaticResource DockLabelStyle}" Text="字体" />
                                 <ComboBox Grid.Row="1"
                                           Style="{StaticResource DockComboBoxStyle}"
+                                          AutomationProperties.Name="字体"
                                           ItemsSource="{Binding FontOptions}"
                                           SelectedValuePath="Id"
                                           SelectedValue="{Binding SelectedFontId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
@@ -461,6 +483,7 @@
                                 </StackPanel>
                                 <Slider Grid.Row="1"
                                         Style="{StaticResource DockSliderStyle}"
+                                        AutomationProperties.Name="时间字号"
                                         Minimum="32"
                                         Maximum="128"
                                         Value="{Binding TimeFontSize, UpdateSourceTrigger=PropertyChanged}" />
@@ -481,6 +504,7 @@
                                 </StackPanel>
                                 <Slider Grid.Row="1"
                                         Style="{StaticResource DockSliderStyle}"
+                                        AutomationProperties.Name="日期字号"
                                         Minimum="16"
                                         Maximum="64"
                                         Value="{Binding DateFontSize, UpdateSourceTrigger=PropertyChanged}" />
@@ -505,6 +529,7 @@
                                 <TextBlock Grid.Row="0" Style="{StaticResource DockLabelStyle}" Text="背景浓度" />
                                 <Slider Grid.Row="1"
                                         Style="{StaticResource DockSliderStyle}"
+                                        AutomationProperties.Name="背景浓度"
                                         Minimum="0"
                                         Maximum="1"
                                         TickFrequency="0.01"
@@ -542,17 +567,20 @@
                                     <Slider Grid.Column="0"
                                             Margin="0,0,9,0"
                                             Style="{StaticResource HueSliderStyle}"
+                                            AutomationProperties.Name="文字颜色色相"
                                             Minimum="0"
                                             Maximum="360"
                                             Value="{Binding Hue, UpdateSourceTrigger=PropertyChanged}" />
                                     <Button Grid.Column="1"
                                             Style="{StaticResource SwatchButtonStyle}"
+                                            AutomationProperties.Name="纯黑"
                                             HorizontalAlignment="Left"
                                             Background="#FF000000"
                                             ToolTip="纯黑"
                                             Click="OnBlackClick" />
                                     <Button Grid.Column="2"
                                             Style="{StaticResource SwatchButtonStyle}"
+                                            AutomationProperties.Name="纯白"
                                             Background="#FFFFFFFF"
                                             ToolTip="纯白"
                                             Click="OnWhiteClick" />
@@ -589,11 +617,12 @@
                                            Text="调整后自动保存" />
                                 <Button Grid.Column="3"
                                         Style="{StaticResource LockButtonStyle}"
+                                        AutomationProperties.Name="锁定"
                                         Click="OnLockClick">
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock Margin="0,0,6,0"
                                                    VerticalAlignment="Center"
-                                                   FontFamily="Segoe Fluent Icons"
+                                                   FontFamily="Segoe MDL2 Assets"
                                                    FontSize="10"
                                                    Text="&#xE72E;" />
                                         <TextBlock VerticalAlignment="Center" Text="锁定" />
@@ -602,7 +631,12 @@
                             </Grid>
                         </Border>
                     </Grid>
-                </Border>
+                    <Border x:Name="PanelOutline"
+                            BorderBrush="#E08EA2F4"
+                            BorderThickness="1"
+                            CornerRadius="12"
+                            IsHitTestVisible="False" />
+                </Grid>
             </Grid>
         </Grid>
     </Border>

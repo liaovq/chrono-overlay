@@ -1,0 +1,15 @@
+Viewport: Windows 11, 150% DPI
+Anchor: visible dock top-right, physical pixels
+
+initial=1635,365
+time:32=1635,365;delta=0,0
+time:72=1635,365;delta=0,0
+time:128=1635,365;delta=0,0
+time:72=1635,365;delta=0,0
+time:32=1635,365;delta=0,0
+time:128=1635,365;delta=0,0
+date:16=1635,365;delta=0,0
+date:31=1635,365;delta=0,0
+date:64=1635,365;delta=0,0
+date:24=1635,365;delta=0,0
+date:64=1635,365;delta=0,0

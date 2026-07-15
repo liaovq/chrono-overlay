@@ -285,6 +285,62 @@ public sealed class SystemBehaviorTests
             ControlPanelShadowLayout.OuterWidth);
     }
 
+    [Theory]
+    [InlineData(32, 1480, 410)]
+    [InlineData(72, 1540, 470)]
+    [InlineData(128, 1620, 560)]
+    public void FontSizeChangesKeepControlPanelTopRightFixed(
+        int fontSize,
+        int resizedPanelLeft,
+        int resizedPanelTop)
+    {
+        Point originalWindowTopLeft = new(1000, 200);
+        Rectangle resizedPanel = new(resizedPanelLeft, resizedPanelTop, 420, 166);
+        Point desiredPanelTopRight = new(1900, 400);
+
+        Point correctedWindowTopLeft = DisplayPlacementMath.PreserveAnchor(
+            originalWindowTopLeft,
+            new Point(resizedPanel.Right, resizedPanel.Top),
+            desiredPanelTopRight);
+
+        int offsetX = correctedWindowTopLeft.X - originalWindowTopLeft.X;
+        int offsetY = correctedWindowTopLeft.Y - originalWindowTopLeft.Y;
+        Point correctedPanelTopRight = new(
+            resizedPanel.Right + offsetX,
+            resizedPanel.Top + offsetY);
+
+        Assert.InRange(fontSize, 32, 128);
+        Assert.Equal(desiredPanelTopRight, correctedPanelTopRight);
+    }
+
+    [Fact]
+    public void RepeatedFontSizeChangesDoNotAccumulateControlPanelDrift()
+    {
+        Point desiredPanelTopRight = new(1800, 620);
+        Point windowTopLeft = new(900, 250);
+        Rectangle[] transientPanelBounds =
+        [
+            new(1300, 500, 420, 166),
+            new(1410, 555, 420, 166),
+            new(1250, 470, 420, 166),
+            new(1380, 525, 420, 166),
+        ];
+
+        foreach (Rectangle panelBounds in transientPanelBounds)
+        {
+            Point corrected = DisplayPlacementMath.PreserveAnchor(
+                windowTopLeft,
+                new Point(panelBounds.Right, panelBounds.Top),
+                desiredPanelTopRight);
+            Point correction = new(corrected.X - windowTopLeft.X, corrected.Y - windowTopLeft.Y);
+            Point correctedAnchor = new(
+                panelBounds.Right + correction.X,
+                panelBounds.Top + correction.Y);
+
+            Assert.Equal(desiredPanelTopRight, correctedAnchor);
+        }
+    }
+
     [Fact]
     public void HotspotToolWindowExplicitlyClearsClickThroughStyle()
     {

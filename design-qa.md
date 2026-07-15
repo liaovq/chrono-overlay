@@ -2,32 +2,35 @@
 
 The earlier GitHub Pages QA report is preserved at `docs/website-design-qa.md`.
 
-- Source visual truth: `C:\Users\Liao\.codex\generated_images\019f5b03-3f59-7080-90bb-c031510529c0\exec-8ec898d2-12df-4db6-a17d-66095a9292d8.png`
-- Implementation screenshot: `artifacts/aurora-dock-qa-final.png`
-- Full-view comparison: `artifacts/aurora-dock-comparison-final.png`
+- Source visual truth: [`docs/design/aurora-control-dock-reference.png`](docs/design/aurora-control-dock-reference.png)
+- Implementation screenshot: [`docs/design/aurora-control-dock-implementation-150.png`](docs/design/aurora-control-dock-implementation-150.png)
+- Full-view comparison: [`docs/design/aurora-control-dock-comparison-150.png`](docs/design/aurora-control-dock-comparison-150.png)
+- Keyboard-focus evidence: [`docs/design/aurora-control-dock-focus-150.png`](docs/design/aurora-control-dock-focus-150.png)
+- Dynamic anchor evidence: [`docs/design/aurora-control-dock-anchor-results.txt`](docs/design/aurora-control-dock-anchor-results.txt)
 - Viewport/state: Windows 11, 150% DPI, unlocked, Major Mono Display, 72px time, 31px date, 0% background concentration.
-- Comparison normalization: the source dock was cropped to `1110×444` and scaled to `630×252`; the WPF dock was captured at native DPI as `630×249`.
+- Comparison normalization: the source dock was cropped from the selected concept and normalized to `630×252`; the WPF dock was captured with `PrintWindow` at native 150% DPI as `630×249`.
 
 ## Findings
 
 No actionable P0, P1, or P2 differences remain.
 
 - [P3] Native text rasterization is slightly heavier than the generated reference.
-  - Location: compact labels and the selected font preview.
-  - Evidence: Segoe UI Variable and the embedded Major Mono Display are rendered by WPF/DirectWrite, while the reference is a generated raster.
-  - Decision: accepted; font families, hierarchy, baseline alignment, and fit match the target, and native rendering remains sharper in the real app.
-- [P3] Control states differ from the static mock where semantics require it.
+  - Location: compact labels and the selected-font preview.
+  - Evidence: WPF/DirectWrite renders Segoe UI Variable and the embedded Major Mono Display, while the reference is a generated raster.
+  - Decision: accepted; font hierarchy, baseline alignment, fit, and native sharpness remain correct.
+- [P3] Runtime state intentionally differs from the static mock where the mock is internally inconsistent.
   - Location: background slider, hue thumb, and auto-start toggle.
-  - Evidence: the mock shows a 0% label with a mid-track opacity thumb, while the implementation correctly places 0% at the start; hue and auto-start reflect the saved setting instead of a decorative state.
-  - Decision: accepted; layout geometry matches and runtime behavior remains truthful.
+  - Evidence: the mock shows a `0%` label with a mid-track opacity thumb; the implementation truthfully places `0%` at the start and reflects the saved hue and auto-start settings.
+  - Decision: accepted; geometry matches the target without presenting false state.
 
 ## Required Fidelity Surfaces
 
-- Fonts and typography: passed. Hierarchy, compact numeric values, selected Major Mono Display preview, and Chinese labels are aligned and readable without clipping.
-- Spacing and layout rhythm: passed. The visible dock is `420×166` DIP; normalized output is within 3 physical pixels of the reference height. Both row dividers, both top column dividers, control baselines, and footer center align with the target.
-- Colors and visual tokens: passed. Midnight surface, blue-violet edge, muted gray tracks, purple-blue active tracks, rainbow hue rail, circular black/white swatches, and coral-violet lock action match the target palette.
-- Image quality and asset fidelity: passed. The dock contains no raster assets requiring replacement; the lock mark uses the native Segoe Fluent Icons library and remains crisp at 150% DPI.
-- Copy and content: passed. Every existing setting is present, “调整后自动保存” matches the selected target, and no unrelated feature was added.
+- Fonts and typography: passed. Major Mono Display, compact numeric values, Chinese labels, weights, baselines, and truncation remain readable without clipping.
+- Spacing and layout rhythm: passed. The visible dock is `420×166` DIP. Content is arranged by a full-size grid, while the 1 DIP outline is a non-layout overlay, so the content receives the full intended size.
+- Colors and visual tokens: passed. Midnight surface, blue-violet edge, muted tracks, purple-blue active tracks, rainbow hue rail, circular swatches, and coral-violet lock action match the selected direction.
+- Image quality and asset fidelity: passed. The dock has no raster UI assets. Chevron and lock glyphs use the Windows-provided Segoe MDL2 Assets font and remain aligned with the source.
+- Copy and content: passed. Every existing setting is present, the selected target's hierarchy is preserved, and no unrelated feature was introduced.
+- Accessibility and interaction states: passed for the implemented visual states. Black and white swatches have explicit automation names. Both custom slider templates expose a high-contrast keyboard focus ring, shown in the committed focus capture.
 
 ## Comparison History
 
@@ -40,24 +43,38 @@ No actionable P0, P1, or P2 differences remain.
 ### Iteration 2
 
 - P2: time/date values were right-aligned instead of sitting beside their labels.
-- P2: the opacity dial and color group were shifted right; the footer status was not centered on the dock.
-- Fix: switched values to inline label groups, shifted the dial and color controls to the measured target positions, and centered the footer status across the full dock.
+- P2: the opacity dial and color group were shifted right; the footer status was not centered.
+- Fix: switched values to inline label groups, shifted the dial and color controls to measured positions, and centered the footer status across the dock.
+
+### Review remediation pass
+
+- P1: continuous time/date resizing changed the `SizeToContent` window bounds and made the dock drift or repeatedly re-evaluate above/below placement.
+- Fix: capture the visible dock's physical top-right coordinate before the bound clock property updates, coalesce render work, restore that coordinate after layout, and persist only the corrected final geometry through the debounced writer.
+- Evidence: six time-size transitions and five date-size transitions, including minimum and maximum values, all recorded `delta=0,0` physical pixels.
+- P1: Segoe Fluent Icons is not included by default on Windows 10.
+- Fix: changed E70D ChevronDown and E72E Lock to Segoe MDL2 Assets, which ships with supported Windows versions.
+- P1: a `420×166` content grid was nested inside a bordered `420×166` container, leaving only `418×164` DIP of layout space.
+- Fix: changed the visible panel to a `420×166` grid with an independent background surface and non-layout outline overlay.
+- P2: visual QA evidence was local-only and color swatches lacked accessible names.
+- Fix: committed normalized reference, implementation, comparison, focus-state, and anchor evidence; added automation names and slider focus visuals.
 
 ### Final pass
 
-- Fixed the selected-font preview padding and optical size so `MAJOR MONO DISPLAY · 几何实` fits the same field width as the reference.
-- Re-captured the WPF window at native 150% DPI and compared both dock regions in one normalized image.
-- No P0/P1/P2 mismatch remains.
+- Re-captured the production WPF surface with embedded fonts at native 150% DPI.
+- Opened the reference and implementation together in the committed comparison image and inspected typography, grid geometry, dividers, radii, outline, controls, icon alignment, palette, and copy.
+- No P0/P1/P2 visual mismatch remains.
 
 ## Interaction Verification
 
+- The isolated WPF run exercised time sizes `32, 72, 128, 72, 32, 128` and date sizes `16, 31, 64, 24, 64`; the dock top-right coordinate remained exactly fixed for every transition.
 - Existing bindings remain active for font, time size, date size, opacity, hue, black, white, auto-start, and lock.
-- Keyboard focus visuals remain present for the dropdown, swatches, toggle, and lock action.
-- Selective click-through, time-only hotspot, clock anchoring, panel flipping, tray behavior, and persistence code were not replaced.
+- The focused-slider capture confirms the custom template exposes a visible keyboard focus outline.
+- Selective click-through, time-only hotspot, clock anchoring during lock transitions, panel flipping, tray behavior, and persistence remain intact.
+- Windows 10 glyph presence and full keyboard traversal remain explicit RC manual-test items because the local visual run used Windows 11.
 
 ## Follow-up Polish
 
-- Recheck the edge glow against a very bright wallpaper and at 100%/200% DPI using the PR RC artifact.
-- Treat any remaining DirectWrite hinting difference as native-platform rendering rather than design drift.
+- Recheck the edge glow against a very bright wallpaper at 100% and 200% DPI using the latest PR RC artifact.
+- Treat remaining DirectWrite hinting differences as native-platform rendering rather than design drift.
 
 final result: passed

@@ -35,7 +35,14 @@ Record Windows version, monitor topology, DPI, executable path, and result for e
 - [ ] Date is `yyyy.MM.dd 星期X` with the correct Chinese weekday.
 - [ ] Time and date remain strictly right-aligned at minimum and maximum sizes.
 - [ ] Time/date size sliders, background concentration, hue, pure black, and pure white update immediately.
+- [ ] Place a visible reference at the control dock's top-right corner, then drag the time-size slider continuously from 32px to 128px and back; the dock does not move or flip while only the clock region grows or shrinks.
+- [ ] Repeat the fixed-dock check with the date-size slider from 16px to 64px, with the dock both below and above the clock, and at 100%, 150%, and 200% DPI.
+- [ ] Change the selected font while watching the same reference point; the dock remains fixed while the clock text reflows.
 - [ ] Slider interaction never starts a window drag.
+- [ ] On Windows 10, confirm the font dropdown chevron and lock icon are visible and use the same glyphs as Windows 11.
+- [ ] Use Tab to reach the font selector, all four sliders, pure-black and pure-white swatches, auto-start toggle, and lock action; every focused control has a visible focus indication.
+- [ ] With a slider focused, use Left/Right, Home/End, and Page Up/Page Down to change its value; the dock remains fixed and the value updates immediately.
+- [ ] Use Space/Enter to operate the black/white swatches, auto-start toggle, and lock action, and confirm a screen reader announces the black and white buttons by name.
 - [ ] Non-control areas drag only after the Windows drag threshold.
 - [ ] Double-clicking time while unlocked locks without starting a drag.
 - [ ] At 32px, 72px, and 128px time sizes, place a visible reference at the clock surface's top-right corner, lock/unlock 10 times, and confirm the corner does not visibly move.

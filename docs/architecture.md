@@ -30,6 +30,8 @@ Lock and unlock transitions capture the physical top-right anchor of `ClockSurfa
 
 While unlocked, `ControlPanelPlacementMath` compares the measured physical panel height with the active monitor's physical work area. It keeps the panel below when possible, flips it above when the lower edge would be clipped, and preserves the clock anchor during the row swap.
 
+When a font or either font-size setting changes, the dock itself becomes the stable visual reference. The window captures the visible dock's physical top-right coordinate before WPF updates its `SizeToContent` layout, then restores that coordinate after the render pass. This keeps the controls stationary while only the clock surface grows or shrinks, coalesces rapid slider updates, and persists the final corrected clock placement with the existing debounced settings writer.
+
 ## Startup and single instance
 
 `StartupModeParser` separates interactive launch from `--autostart`. Auto-start uses WPF's one-time non-activating show behavior, while later tray or second-instance wake actions can still activate the unlocked window normally.
