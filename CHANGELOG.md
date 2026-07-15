@@ -6,9 +6,10 @@ All notable changes are documented here. ChronoOverlay follows semantic versioni
 
 ### Added
 
-- Added instant, persistent clock-font switching between the system monospace fallback, JetBrains Mono, IBM Plex Mono, and Space Mono.
-- Bundled the three third-party fonts with their OFL 1.1 license texts and pinned source provenance.
+- Added instant, persistent clock-font switching between the system monospace fallback, JetBrains Mono, IBM Plex Mono, Space Mono, Major Mono Display, and VT323.
+- Bundled the five third-party fonts with their OFL 1.1 license texts and pinned source provenance.
 - Added an offline, single-instance “第三方许可” window reachable from the tray, with complete embedded license text and copyable content.
+- Refined the unlocked controls into a narrower bright-silver frosted panel with aligned labels, values, color controls, and matching buttons.
 
 ### Fixed
 

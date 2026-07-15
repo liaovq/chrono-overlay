@@ -54,6 +54,8 @@ public sealed class AppSettingsTests
     [InlineData(ClockFontIds.JetBrainsMono)]
     [InlineData(ClockFontIds.IbmPlexMono)]
     [InlineData(ClockFontIds.SpaceMono)]
+    [InlineData(ClockFontIds.MajorMonoDisplay)]
+    [InlineData(ClockFontIds.Vt323)]
     public void NormalizePreservesSupportedClockFonts(string fontId)
     {
         AppSettings settings = new() { ClockFontId = fontId };

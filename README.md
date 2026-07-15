@@ -9,7 +9,8 @@ ChronoOverlay 是一个轻量、可锁定、始终置顶的 Windows 桌面悬浮
 - 24 小时制时间与中文日期，始终显示秒
 - 时间和日期严格右对齐，数字使用等宽字体
 - 独立调整时间字号、日期字号、文字颜色与背景浓度
-- 在系统等宽、JetBrains Mono、IBM Plex Mono 与 Space Mono 之间即时切换并自动保存
+- 在系统等宽、JetBrains Mono、IBM Plex Mono、Space Mono、Major Mono Display 与 VT323 之间即时切换并自动保存
+- 亮银磨砂控制面板采用紧凑对齐布局，颜色、字号与锁定操作更清晰
 - 控制面板接近屏幕底边时自动翻到时钟上方，锁定按钮始终可操作
 - 解锁时自由拖动，锁定后固定坐标
 - 锁定后背景、日期和空白区域鼠标穿透

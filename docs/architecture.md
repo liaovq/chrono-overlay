@@ -7,13 +7,13 @@ ChronoOverlay is a .NET 8 WPF application targeting `win-x64`. Releases are fram
 - `ClockWindow` renders the clock, date, background, and unlocked control panel.
 - `LockedHotspotWindow` is a transparent, topmost, non-activating window that covers only the measured time text rectangle.
 - `ClockViewModel` owns display state and settings bindings.
-- `ClockFontCatalog` resolves the system fallback and the three OFL-licensed fonts packaged as WPF resources.
+- `ClockFontCatalog` resolves the system fallback and the five OFL-licensed fonts packaged as WPF resources.
 - `ClockService` aligns updates to system second boundaries.
 - `SettingsService` validates, debounces, and atomically persists configuration.
 - `WindowStyleService` applies Win32 extended styles for tool-window behavior, click-through, no-activate, and topmost placement.
 - `DisplayPlacementService` uses `GetWindowRect`, `MonitorFromWindow`, `GetMonitorInfo`, and per-monitor DPI to persist and restore one explicit physical-pixel coordinate model.
 - `TrayIconService`, `AutoStartService`, and `SingleInstanceService` isolate Windows lifecycle integrations.
-- `ThirdPartyLicenseContentService` reads the notice and three complete OFL texts from embedded WPF resources; `ThirdPartyLicenseWindowService` owns a single reusable local license-window instance without touching clock state.
+- `ThirdPartyLicenseContentService` reads the notice and five complete OFL texts from embedded WPF resources; `ThirdPartyLicenseWindowService` owns a single reusable local license-window instance without touching clock state.
 
 ## Selective click-through
 

@@ -42,7 +42,9 @@ public sealed class ClockViewModelTests : IDisposable
         Assert.Equal(ClockFontIds.SpaceMono, settings.ClockFontId);
         Assert.Equal(ClockFontIds.SpaceMono, viewModel.SelectedFontId);
         Assert.Contains("Space Mono", viewModel.SelectedFontFamily.Source, StringComparison.Ordinal);
-        Assert.Equal(4, viewModel.FontOptions.Count);
+        Assert.Equal(6, viewModel.FontOptions.Count);
+        Assert.Contains(viewModel.FontOptions, option => option.Id == ClockFontIds.MajorMonoDisplay);
+        Assert.Contains(viewModel.FontOptions, option => option.Id == ClockFontIds.Vt323);
     }
 
     public void Dispose()
